@@ -185,7 +185,7 @@ function openModuleTrack(trackNumber) {
   showPanel("screen-modules");
   document.getElementById("review-card").hidden = true;
   renderModuleSlide();
-  window.scrollTo({ top: 0, behavior: "smooth" });
+  requestAnimationFrame(() => window.scrollTo(0, 0));
 }
 
 function baselineLevelKey() {
@@ -205,7 +205,7 @@ function startBaselineQuiz() {
       : `Opening quiz · Intermediate · ${activeQuizItems.length} questions`;
   renderQuiz(activeQuizItems);
   showPanel("screen-quiz");
-  window.scrollTo({ top: 0, behavior: "smooth" });
+  requestAnimationFrame(() => window.scrollTo(0, 0));
 }
 
 function startCheckpointQuiz() {
@@ -219,7 +219,7 @@ function startCheckpointQuiz() {
   document.getElementById("quiz-context").textContent = `${title} · need ${lastStarThreshold} / ${activeQuizItems.length} correct for a star`;
   renderQuiz(activeQuizItems);
   showPanel("screen-quiz");
-  window.scrollTo({ top: 0, behavior: "smooth" });
+  requestAnimationFrame(() => window.scrollTo(0, 0));
 }
 
 function renderQuiz(items) {
@@ -438,7 +438,7 @@ document.getElementById("btn-reset-progress").addEventListener("click", () => {
   saveState();
   renderHome();
   showPanel("screen-home");
-  window.scrollTo({ top: 0, behavior: "smooth" });
+  requestAnimationFrame(() => window.scrollTo(0, 0));
 });
 
 document.getElementById("btn-module-next").addEventListener("click", () => {
@@ -482,7 +482,7 @@ document.getElementById("quiz-form").addEventListener("submit", (e) => {
   renderProgressStrip();
 
   showPanel("screen-results");
-  document.getElementById("screen-results").scrollIntoView({ behavior: "smooth", block: "start" });
+  requestAnimationFrame(() => window.scrollTo(0, 0));
 });
 
 document.getElementById("btn-results-primary").addEventListener("click", () => {
@@ -492,7 +492,7 @@ document.getElementById("btn-results-primary").addEventListener("click", () => {
   if (state.level === "graduate") {
     showPanel("screen-home");
     renderHome();
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    requestAnimationFrame(() => window.scrollTo(0, 0));
     return;
   }
 
@@ -506,7 +506,7 @@ document.getElementById("btn-results-primary").addEventListener("click", () => {
       showPanel("screen-levelup");
       document.getElementById("levelup-body").textContent =
         "You collected three golden stars on the Beginner path. Intermediate adds new modules and three more checkpoints—the same rhythm, harder habits.";
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      requestAnimationFrame(() => window.scrollTo(0, 0));
       return;
     }
     if (state.level === "intermediate" && state.stars === 3) {
@@ -514,7 +514,7 @@ document.getElementById("btn-results-primary").addEventListener("click", () => {
       saveState();
       showPanel("screen-home");
       renderHome();
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      requestAnimationFrame(() => window.scrollTo(0, 0));
       return;
     }
     openModuleTrack(state.stars + 1);
