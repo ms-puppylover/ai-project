@@ -476,6 +476,14 @@ document.getElementById("quiz-form").addEventListener("submit", (e) => {
     }
   }
 
+  if (pct === 100) {
+    setTimeout(() => {
+      confetti({ particleCount: 180, spread: 80, origin: { y: 0.3 }, colors: ["#7c4a1e","#c8831a","#f5d08a","#5a8a3c","#fff8f0"] });
+      setTimeout(() => confetti({ particleCount: 120, spread: 100, origin: { x: 0.1, y: 0.5 } }), 300);
+      setTimeout(() => confetti({ particleCount: 120, spread: 100, origin: { x: 0.9, y: 0.5 } }), 500);
+    }, 400);
+  }
+
   document.getElementById("reading-body").innerHTML = "";
   renderReading(tier);
   renderWrongReview(details, activeQuizItems);
