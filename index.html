@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Real or AI? — Can you tell the difference?</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="noise" aria-hidden="true"></div>
+  <main class="shell">
+    <header class="hero">
+      <p class="eyebrow">AI Literacy · Mini Course</p>
+      <h1>Real or <em>AI?</em></h1>
+      <p class="lede" id="hero-lede">
+        Think you can spot AI-generated text and images? Prove it. Three skill tracks, checkpoint quizzes, and golden stars. <strong>Three stars</strong> unlocks the next level.
+      </p>
+    </header>
+
+    <div class="progress-strip" id="progress-strip" aria-label="Your progress">
+      <div class="progress-strip-inner">
+        <span class="level-pill" id="level-pill">Beginner</span>
+        <div class="stars-row" id="stars-row" title="Stars earned this level"></div>
+      </div>
+    </div>
+
+    <section id="screen-home" class="panel active" aria-labelledby="home-heading">
+      <h2 id="home-heading" class="sr-only">Home</h2>
+      <p class="home-status" id="home-status"></p>
+      <ul class="rules" id="home-rules">
+        <li><strong>Opening quiz</strong> — warm-up round, mixed questions.</li>
+        <li><strong>3 skill tracks</strong> — each one teaches you something different (words, images, habits).</li>
+        <li><strong>Checkpoint quiz</strong> — after each track, prove you got it. Hit ~73%+ to earn a <strong>golden star ★</strong>.</li>
+        <li><strong>Three stars</strong> on Beginner unlocks <strong>Intermediate</strong> — harder tracks, trickier questions.</li>
+      </ul>
+      <div class="home-actions">
+        <button type="button" class="btn primary" id="btn-home-primary">Let's go →</button>
+        <button type="button" class="btn ghost" id="btn-reset-progress" hidden>Reset progress</button>
+      </div>
+    </section>
+
+    <section id="screen-modules" class="panel" aria-labelledby="modules-heading" hidden>
+      <p class="module-meta" id="module-meta"></p>
+      <h2 class="module-h2" id="modules-heading">Module</h2>
+      <div class="module-body" id="module-body"></div>
+      <p class="module-slide-count" id="module-slide-count" aria-live="polite"></p>
+      <button type="button" class="btn primary" id="btn-module-next">Next</button>
+    </section>
+
+    <section id="screen-quiz" class="panel" aria-labelledby="quiz-heading" hidden>
+      <div class="quiz-top">
+        <p class="quiz-context" id="quiz-context" aria-live="polite"></p>
+        <h2 id="quiz-heading" class="sr-only">Quiz</h2>
+        <p class="progress" id="quiz-progress" aria-live="polite"></p>
+      </div>
+      <form id="quiz-form" novalidate>
+        <div id="quiz-items"></div>
+        <div class="form-actions">
+          <button type="submit" class="btn primary" id="btn-submit">Submit answers</button>
+        </div>
+      </form>
+    </section>
+
+    <section id="screen-results" class="panel" hidden aria-labelledby="results-heading">
+      <div class="star-award" id="star-award" hidden aria-live="polite">
+        <span class="golden-star" aria-hidden="true">★</span>
+        <p class="star-award-text" id="star-award-text">Golden star earned!</p>
+      </div>
+      <h2 id="results-heading">Your result</h2>
+      <p class="score-display" id="score-line" aria-live="polite"></p>
+      <p class="tier-label" id="tier-label"></p>
+      <p class="tier-blurb" id="tier-blurb"></p>
+      <div class="review-card" id="review-card" hidden aria-live="polite">
+        <h3>What you missed — and why</h3>
+        <p class="review-intro" id="review-intro"></p>
+        <div id="review-list"></div>
+      </div>
+      <div class="reading-card" id="reading-card">
+        <h3>Level up your skills</h3>
+        <div id="reading-body"></div>
+      </div>
+      <div class="results-actions" id="results-actions">
+        <button type="button" class="btn primary" id="btn-results-primary">Continue</button>
+        <button type="button" class="btn ghost" id="btn-results-secondary" hidden>Try again</button>
+      </div>
+    </section>
+
+    <section id="screen-levelup" class="panel" hidden aria-labelledby="levelup-heading">
+      <h2 id="levelup-heading" class="levelup-title">Level up! 🎉</h2>
+      <p class="levelup-body" id="levelup-body"></p>
+      <button type="button" class="btn primary" id="btn-levelup-ok">Start Intermediate →</button>
+    </section>
+  </main>
+  <script src="course-content.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
