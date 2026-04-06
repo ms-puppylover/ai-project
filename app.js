@@ -432,14 +432,17 @@ document.getElementById("btn-home-primary").addEventListener("click", () => {
   }
 });
 
-document.getElementById("btn-reset-progress").addEventListener("click", () => {
+function resetProgress() {
   if (!confirm("Reset all saved progress on this device?")) return;
   state = defaultState();
   saveState();
   renderHome();
   showPanel("screen-home");
   requestAnimationFrame(() => window.scrollTo(0, 0));
-});
+}
+
+document.getElementById("btn-reset-progress").addEventListener("click", resetProgress);
+document.getElementById("btn-module-reset").addEventListener("click", resetProgress);
 
 document.getElementById("btn-module-next").addEventListener("click", () => {
   const tracks = getModuleTracks();

@@ -329,6 +329,8 @@ h1 em {
 
 .module-slide-count { font-size: 0.85rem; color: var(--muted); margin: 0 0 1rem; font-weight: 700; }
 
+.module-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; }
+
 .star-award { text-align: center; padding: 1rem 1rem 0.25rem; margin-bottom: 0.5rem; }
 .golden-star { display: block; font-size: 3.5rem; line-height: 1; color: var(--warn); text-shadow: 0 0 30px rgba(245,158,11,0.5); margin-bottom: 0.35rem; animation: pop 0.4s cubic-bezier(0.34,1.56,0.64,1); }
 
