@@ -636,3 +636,136 @@ h1 em {
     padding-right: 2rem;
   }
 }
+
+/* ── Interactive module enhancements ── */
+
+.module-img-wrap {
+  margin: 0 0 1rem;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: #ede8df;
+}
+
+.module-img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.fun-box {
+  margin: 1rem 0;
+  padding: 0.85rem 1rem;
+  background: rgba(200, 146, 42, 0.1);
+  border: 1.5px solid rgba(200, 146, 42, 0.35);
+  border-radius: 10px;
+  font-size: 0.93rem;
+  line-height: 1.55;
+  color: #5a3e08;
+}
+
+.fun-box strong {
+  color: #a07030;
+}
+
+.try-it {
+  margin: 1rem 0;
+  padding: 0.85rem 1rem;
+  background: rgba(106, 176, 200, 0.1);
+  border: 1.5px solid var(--accent-border);
+  border-radius: 10px;
+  font-size: 0.93rem;
+  line-height: 1.55;
+  color: #1a5e72;
+}
+
+.try-it strong {
+  display: block;
+  margin-bottom: 0.25rem;
+  color: #2a6e85;
+}
+
+.fact-bubble {
+  margin: 1rem 0;
+  padding: 0.85rem 1rem;
+  background: rgba(80, 180, 120, 0.08);
+  border: 1.5px solid rgba(80, 160, 100, 0.3);
+  border-radius: 10px;
+  font-size: 0.93rem;
+  line-height: 1.55;
+  color: #1a4a2e;
+}
+
+.fact-bubble strong {
+  color: #2e7d52;
+}
+
+.compare-wrap {
+  margin: 1rem 0;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.compare-human,
+.compare-ai {
+  padding: 0.7rem 0.9rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.compare-human {
+  background: rgba(90, 150, 184, 0.08);
+  border: 1px solid rgba(90, 150, 184, 0.32);
+  color: #2a3e50;
+}
+
+.compare-ai {
+  background: rgba(155, 125, 176, 0.08);
+  border: 1px solid rgba(155, 125, 176, 0.32);
+  color: #3a2a50;
+}
+
+.compare-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 0.3rem;
+}
+
+.compare-human .compare-label {
+  color: #2a5c78;
+}
+
+.compare-ai .compare-label {
+  color: #5e3d7a;
+}
+
+.module-checklist {
+  list-style: none;
+  padding: 0;
+  margin: 0.75rem 0;
+}
+
+.module-checklist li {
+  padding: 0.45rem 0 0.45rem 2rem;
+  position: relative;
+  font-size: 0.93rem;
+  color: #5a4e3a;
+  border-bottom: 1px solid var(--border);
+  line-height: 1.45;
+}
+
+.module-checklist li:last-child {
+  border-bottom: none;
+}
+
+.module-checklist li::before {
+  content: attr(data-icon);
+  position: absolute;
+  left: 0;
+  top: 0.4rem;
+  font-size: 1rem;
+  line-height: 1;
+}
