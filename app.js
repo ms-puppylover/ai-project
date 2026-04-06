@@ -1,60 +1,87 @@
 /**
  * Course flow: baseline quiz → (modules → checkpoint quiz) × 3 → level up.
- * Values: "human" = real photo or person-written; "ai" = synthetic / AI-style text.
+ * State v2: per-level progress stored in levelData.
  */
 
-const STORAGE_KEY = "realOrAiCourseV1";
+const STORAGE_KEY = "realOrAiCourseV2";
 
-/** Updated on each quiz submit (checkpoints use ~73% threshold). */
 let lastStarThreshold = 8;
 
 const LEVEL_LABELS = {
   beginner: "Beginner",
   intermediate: "Intermediate",
-  graduate: "Graduate",
 };
 
 let state = loadState();
-/** Quiz just submitted */
 let lastQuizKind = "baseline";
 let lastCheckpointPassed = false;
 let lastScore = { correct: 0, total: 10, pct: 0 };
-/** In-memory module navigation */
 let activeModuleTrack = 1;
 let moduleSlideIndex = 0;
-/** Current question list (baseline or track-specific checkpoint) */
 let activeQuizItems = QUIZ_BASELINE_BEGINNER;
 
 function defaultState() {
   return {
-    v: 1,
+    v: 2,
     level: "beginner",
-    stars: 0,
-    baselineDone: false,
+    levelData: {
+      beginner:      { stars: 0, baselineDone: false, completed: false },
+      intermediate:  { stars: 0, baselineDone: false, completed: false },
+    },
   };
 }
 
 function loadState() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return migrateOldState();
+    const p = JSON.parse(raw);
+    if (p.v !== 2) return migrateOldState();
+    const s = defaultState();
+    s.level = (p.level === "intermediate") ? "intermediate" : "beginner";
+    if (p.levelData) {
+      ["beginner", "intermediate"].forEach(lv => {
+        if (p.levelData[lv]) {
+          s.levelData[lv].stars       = Math.min(3, Math.max(0, Number(p.levelData[lv].stars) || 0));
+          s.levelData[lv].baselineDone = Boolean(p.levelData[lv].baselineDone);
+          s.levelData[lv].completed    = Boolean(p.levelData[lv].completed);
+        }
+      });
+    }
+    return s;
+  } catch { return defaultState(); }
+}
+
+function migrateOldState() {
+  // Try to migrate from v1 storage
+  try {
+    const raw = localStorage.getItem("realOrAiCourseV1");
     if (!raw) return defaultState();
     const p = JSON.parse(raw);
-    if (p.v !== 1) return defaultState();
-    return {
-      ...defaultState(),
-      ...p,
-      level: p.level === "intermediate" || p.level === "graduate" ? p.level : "beginner",
-      stars: Math.min(3, Math.max(0, Number(p.stars) || 0)),
-      baselineDone: Boolean(p.baselineDone),
-    };
-  } catch {
-    return defaultState();
-  }
+    const s = defaultState();
+    if (p.level === "graduate") {
+      s.level = "intermediate";
+      s.levelData.beginner     = { stars: 3, baselineDone: true, completed: true };
+      s.levelData.intermediate = { stars: 3, baselineDone: true, completed: true };
+    } else if (p.level === "intermediate") {
+      s.level = "intermediate";
+      s.levelData.beginner     = { stars: 3, baselineDone: true, completed: true };
+      s.levelData.intermediate = { stars: Math.min(3, Number(p.stars)||0), baselineDone: Boolean(p.baselineDone), completed: false };
+    } else {
+      s.level = "beginner";
+      s.levelData.beginner = { stars: Math.min(3, Number(p.stars)||0), baselineDone: Boolean(p.baselineDone), completed: p.stars >= 3 };
+    }
+    return s;
+  } catch { return defaultState(); }
 }
 
 function saveState() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 }
+
+// ── Helpers for current level ──
+function cur() { return state.levelData[state.level]; }
+function intermediateUnlocked() { return state.levelData.beginner.completed || state.levelData.intermediate.stars > 0 || state.levelData.intermediate.baselineDone; }
 
 function tierForPercent(p) {
   if (p < 50) return "foundation";
@@ -71,15 +98,11 @@ function showPanel(id) {
 }
 
 function choiceLabels(kind) {
-  if (kind === "image") {
-    return { human: "Real photo", ai: "AI or synthetic" };
-  }
+  if (kind === "image") return { human: "Real photo", ai: "AI or synthetic" };
   return { human: "Human-written", ai: "AI-style text" };
 }
 
-function answerLabel(kind, value) {
-  return choiceLabels(kind)[value] || value;
-}
+function answerLabel(kind, value) { return choiceLabels(kind)[value] || value; }
 
 function escapeHtml(text) {
   const div = document.createElement("div");
@@ -88,26 +111,43 @@ function escapeHtml(text) {
 }
 
 function formatExplanationParagraphs(text) {
-  return text
-    .split(/\n\n+/)
-    .map((p) => p.trim())
-    .filter(Boolean)
-    .map((p) => `<p>${escapeHtml(p)}</p>`)
-    .join("");
+  return text.split(/\n\n+/).map(p => p.trim()).filter(Boolean).map(p => `<p>${escapeHtml(p)}</p>`).join("");
 }
 
 function renderStarsRow() {
   const row = document.getElementById("stars-row");
-  const max = 3;
-  const filled = state.level === "graduate" ? 3 : state.stars;
+  const filled = cur().stars;
   row.innerHTML = "";
-  for (let i = 0; i < max; i++) {
+  for (let i = 0; i < 3; i++) {
     const span = document.createElement("span");
     span.className = "star-slot" + (i < filled ? " filled" : "");
     span.textContent = "★";
     span.setAttribute("aria-label", i < filled ? "Star earned" : "Star not earned yet");
     row.appendChild(span);
   }
+}
+
+function renderLevelTabs() {
+  const tabs = document.getElementById("level-tabs");
+  if (!tabs) return;
+  const levels = ["beginner", "intermediate"];
+  tabs.innerHTML = levels.map(lv => {
+    const unlocked = lv === "beginner" || intermediateUnlocked();
+    const active = lv === state.level;
+    const done = state.levelData[lv].completed;
+    return `<button class="level-tab${active ? " active" : ""}${!unlocked ? " locked" : ""}" data-level="${lv}" ${!unlocked ? "disabled title='Complete Beginner first'" : ""}>
+      ${LEVEL_LABELS[lv]}${done ? " ✅" : ""}
+    </button>`;
+  }).join("");
+
+  tabs.querySelectorAll(".level-tab:not([disabled])").forEach(btn => {
+    btn.addEventListener("click", () => {
+      if (btn.dataset.level === state.level) return;
+      state.level = btn.dataset.level;
+      saveState();
+      renderHome();
+    });
+  });
 }
 
 function renderProgressStrip() {
@@ -117,55 +157,56 @@ function renderProgressStrip() {
 
 function renderHome() {
   renderProgressStrip();
-  const status = document.getElementById("home-status");
+  renderLevelTabs();
+  const status  = document.getElementById("home-status");
   const primary = document.getElementById("btn-home-primary");
-  const reset = document.getElementById("btn-reset-progress");
+  const reset   = document.getElementById("btn-reset-progress");
 
-  if (state.level === "graduate") {
-    status.textContent =
-      "You finished the Beginner path (three golden stars), then the Intermediate path (three more). That’s the full track for now—your progress is saved in this browser.";
+  const data = cur();
+  reset.hidden = !data.baselineDone && data.stars === 0 && state.level === "beginner";
+
+  if (data.completed) {
+    const otherLevel = state.level === "beginner" ? "intermediate" : null;
+    status.textContent = `You've completed the ${LEVEL_LABELS[state.level]} path with 3 stars! ${otherLevel ? "Switch to Intermediate above to keep going." : "You've finished the whole course — amazing work! 🎉"}`;
     primary.textContent = "Review opening quiz";
     primary.hidden = false;
     reset.hidden = false;
     return;
   }
 
-  reset.hidden = state.level === "beginner" && !state.baselineDone && state.stars === 0;
-
-  if (!state.baselineDone) {
-    const sample = CHECKPOINT_QUIZZES.beginner[0];
+  if (!data.baselineDone) {
+    const sample = CHECKPOINT_QUIZZES[state.level === "intermediate" ? "intermediate" : "beginner"][0];
     const need = starThresholdForQuiz(sample);
-    status.textContent =
-      state.level === "beginner"
-        ? `Start with an opening quiz. Then open three module tracks—each teaches a different skill and ends in a new checkpoint quiz (${need}+ of ${sample.length} for a star, about 73%).`
-        : "Welcome to Intermediate. Take the opening quiz, then three new module tracks—each checkpoint quiz matches what you just studied.";
+    status.textContent = state.level === "beginner"
+      ? `Start with an opening quiz. Then do 3 module tracks — each ends with a checkpoint (${need}+ of ${sample.length} for a ⭐).`
+      : "Welcome to Intermediate! Take the opening quiz, then tackle 3 harder module tracks.";
     primary.textContent = "Take opening quiz";
+    primary.hidden = false;
     return;
   }
 
-  if (state.stars < 3) {
-    const next = state.stars + 1;
-    const cp = getCheckpointQuizForLevel(state.level, next);
+  if (data.stars < 3) {
+    const next = data.stars + 1;
+    const cp   = getCheckpointQuizForLevel(state.level, next);
     const need = starThresholdForQuiz(cp);
-    status.textContent = `You have ${state.stars} / 3 golden stars on the ${LEVEL_LABELS[state.level]} path. Open module track ${next} of 3, then pass its checkpoint (${need}+ / ${cp.length}) for your next star.`;
+    status.textContent = `You have ${data.stars} / 3 ⭐ on ${LEVEL_LABELS[state.level]}. Open module track ${next} of 3, then pass its checkpoint (${need}+ / ${cp.length}) for your next star.`;
     primary.textContent = `Open module track ${next} of 3`;
+    primary.hidden = false;
     return;
   }
 
-  status.textContent = "Unexpected state—try Reset progress.";
+  status.textContent = "Unexpected state — try Reset progress.";
   primary.hidden = true;
 }
 
 function getModuleTracks() {
-  if (state.level === "intermediate") return MODULES_BY_LEVEL.intermediate;
-  return MODULES_BY_LEVEL.beginner;
+  return state.level === "intermediate" ? MODULES_BY_LEVEL.intermediate : MODULES_BY_LEVEL.beginner;
 }
 
 function renderModuleSlide() {
   const tracks = getModuleTracks();
-  const trackIndex = activeModuleTrack - 1;
-  const slides = tracks[trackIndex] || [];
-  const slide = slides[moduleSlideIndex];
+  const slides = tracks[activeModuleTrack - 1] || [];
+  const slide  = slides[moduleSlideIndex];
   if (!slide) return;
 
   document.getElementById("module-meta").textContent =
@@ -174,30 +215,25 @@ function renderModuleSlide() {
   document.getElementById("module-body").innerHTML = slide.html;
   document.getElementById("module-slide-count").textContent = `Page ${moduleSlideIndex + 1} of ${slides.length}`;
 
-  const btn = document.getElementById("btn-module-next");
+  const btn  = document.getElementById("btn-module-next");
   const last = moduleSlideIndex >= slides.length - 1;
   btn.textContent = last ? "Take checkpoint quiz" : "Next";
 }
 
 function openModuleTrack(trackNumber) {
   activeModuleTrack = Math.max(1, Math.min(3, trackNumber));
-  moduleSlideIndex = 0;
+  moduleSlideIndex  = 0;
   showPanel("screen-modules");
   document.getElementById("review-card").hidden = true;
   renderModuleSlide();
   requestAnimationFrame(() => window.scrollTo(0, 0));
 }
 
-function baselineLevelKey() {
-  if (state.level === "beginner") return "beginner";
-  return "intermediate";
-}
-
 function startBaselineQuiz() {
-  lastQuizKind = "baseline";
-  activeQuizItems = getBaselineQuizForLevel(baselineLevelKey());
+  lastQuizKind  = "baseline";
+  activeQuizItems = getBaselineQuizForLevel(state.level === "intermediate" ? "intermediate" : "beginner");
   lastStarThreshold = starThresholdForQuiz(activeQuizItems);
-  document.getElementById("star-award").hidden = true;
+  document.getElementById("star-award").hidden  = true;
   document.getElementById("review-card").hidden = true;
   document.getElementById("quiz-context").textContent =
     state.level === "beginner"
@@ -209,12 +245,12 @@ function startBaselineQuiz() {
 }
 
 function startCheckpointQuiz() {
-  lastQuizKind = "checkpoint";
+  lastQuizKind  = "checkpoint";
   activeQuizItems = getCheckpointQuizForLevel(state.level, activeModuleTrack);
   lastStarThreshold = starThresholdForQuiz(activeQuizItems);
   const tierKey = state.level === "intermediate" ? "intermediate" : "beginner";
-  const title = CHECKPOINT_TITLES[tierKey][activeModuleTrack - 1] || "Checkpoint";
-  document.getElementById("star-award").hidden = true;
+  const title   = CHECKPOINT_TITLES[tierKey][activeModuleTrack - 1] || "Checkpoint";
+  document.getElementById("star-award").hidden  = true;
   document.getElementById("review-card").hidden = true;
   document.getElementById("quiz-context").textContent = `${title} · need ${lastStarThreshold} / ${activeQuizItems.length} correct for a star`;
   renderQuiz(activeQuizItems);
@@ -226,121 +262,98 @@ function renderQuiz(items) {
   const container = document.getElementById("quiz-items");
   container.innerHTML = "";
   items.forEach((item, index) => {
-    const labels = choiceLabels(item.kind);
+    const labels  = choiceLabels(item.kind);
     const typeTag = item.kind === "image" ? "Image" : "Text";
     const lastHint = index === items.length - 1 ? " · Toughest call" : "";
     const article = document.createElement("article");
     article.className = "quiz-item";
-    const mediaBlock =
-      item.kind === "image"
-        ? `<div class="quiz-image-wrap">
-             <img class="quiz-image" src="${item.imageSrc}" alt="${escapeHtml(item.imageAlt)}" width="480" height="320" loading="lazy" decoding="async" />
-           </div>
-           <p class="image-prompt">Was this taken with a camera in the real world, or is it AI / synthetic art?</p>`
-        : `<p class="passage">${escapeHtml(item.passage)}</p>`;
-
+    const mediaBlock = item.kind === "image"
+      ? `<div class="quiz-image-wrap"><img class="quiz-image" src="${item.imageSrc}" alt="${escapeHtml(item.imageAlt)}" width="480" height="320" loading="lazy" decoding="async" /></div><p class="image-prompt">Was this taken with a camera, or is it AI / synthetic?</p>`
+      : `<p class="passage">${escapeHtml(item.passage)}</p>`;
     article.innerHTML = `
       <p class="quiz-item-label">${typeTag} · Question ${index + 1} of ${items.length}${lastHint}</p>
       ${mediaBlock}
       <div class="choice-row">
-        <label class="choice-human">
-          <input type="radio" name="${item.id}" value="human" required />
-          ${escapeHtml(labels.human)}
-        </label>
-        <label class="choice-ai">
-          <input type="radio" name="${item.id}" value="ai" required />
-          ${escapeHtml(labels.ai)}
-        </label>
-      </div>
-    `;
+        <label class="choice-human"><input type="radio" name="${item.id}" value="human" required />${escapeHtml(labels.human)}</label>
+        <label class="choice-ai"><input type="radio" name="${item.id}" value="ai" required />${escapeHtml(labels.ai)}</label>
+      </div>`;
     container.appendChild(article);
   });
   updateProgress(items);
-  const form = document.getElementById("quiz-form");
-  form.querySelectorAll('input[type="radio"]').forEach((input) => {
+  document.getElementById("quiz-form").querySelectorAll('input[type="radio"]').forEach(input => {
     input.addEventListener("change", () => updateProgress(items));
   });
 }
 
 function updateProgress(items) {
-  const answered = items.filter((item) => {
-    const checked = document.querySelector(`input[name="${item.id}"]:checked`);
-    return Boolean(checked);
-  }).length;
+  const answered = items.filter(item => document.querySelector(`input[name="${item.id}"]:checked`)).length;
   document.getElementById("quiz-progress").textContent = `${answered} of ${items.length} answered`;
 }
 
 function scoreForm(form, items) {
   let correct = 0;
-  const details = items.map((item) => {
+  const details = items.map(item => {
     const selected = form.querySelector(`input[name="${item.id}"]:checked`);
     const guess = selected ? selected.value : null;
     const ok = guess === item.answer;
-    if (ok) correct += 1;
+    if (ok) correct++;
     return { ...item, guess, ok };
   });
   return { correct, total: items.length, details };
 }
 
 function renderWrongReview(details, items) {
-  const card = document.getElementById("review-card");
+  const card  = document.getElementById("review-card");
   const intro = document.getElementById("review-intro");
-  const list = document.getElementById("review-list");
+  const list  = document.getElementById("review-list");
   card.hidden = false;
-
-  const wrong = details.filter((d) => !d.ok);
+  const wrong = details.filter(d => !d.ok);
   if (wrong.length === 0) {
-    intro.textContent =
-      "Nothing to review—you labeled every item correctly on this quiz. Keep combining clues (text + source + image) when it counts in the real world.";
+    intro.textContent = "Nothing to review — you labeled every item correctly! Keep combining clues when it counts.";
     list.innerHTML = `<p class="review-perfect-note">No missed questions. Your reading track is below.</p>`;
     return;
   }
-
-  intro.textContent = `Below is each question you missed, what you picked, the correct label, and why—so the quiz is a little lesson, not just a number.`;
-
-  list.innerHTML = wrong
-    .map((d) => {
-      const idx = items.findIndex((q) => q.id === d.id) + 1;
-      const typeTag = d.kind === "image" ? "Image" : "Text";
-      const you = answerLabel(d.kind, d.guess);
-      const corr = answerLabel(d.kind, d.answer);
-      const thumb =
-        d.kind === "image"
-          ? `<div class="review-thumb-wrap"><img class="review-thumb" src="${d.imageSrc}" alt="${escapeHtml(d.imageAlt)}" width="240" height="160" loading="lazy" decoding="async" /></div>`
-          : `<blockquote class="review-quote">${escapeHtml(d.passage)}</blockquote>`;
-      return `<article class="review-item">
-        <h4 class="review-item-title">${typeTag} · Question ${idx}</h4>
-        ${thumb}
-        <p class="review-picks"><span class="review-wrong-pick">You chose: ${escapeHtml(you)}</span> · <span class="review-right-pick">Correct: ${escapeHtml(corr)}</span></p>
-        <div class="review-explain">${formatExplanationParagraphs(d.explanation)}</div>
-      </article>`;
-    })
-    .join("");
+  intro.textContent = "Below is each question you missed, what you picked, the correct label, and why.";
+  list.innerHTML = wrong.map(d => {
+    const idx     = items.findIndex(q => q.id === d.id) + 1;
+    const typeTag = d.kind === "image" ? "Image" : "Text";
+    const you     = answerLabel(d.kind, d.guess);
+    const corr    = answerLabel(d.kind, d.answer);
+    const thumb   = d.kind === "image"
+      ? `<div class="review-thumb-wrap"><img class="review-thumb" src="${d.imageSrc}" alt="${escapeHtml(d.imageAlt)}" width="240" height="160" loading="lazy" decoding="async" /></div>`
+      : `<blockquote class="review-quote">${escapeHtml(d.passage)}</blockquote>`;
+    return `<article class="review-item">
+      <h4 class="review-item-title">${typeTag} · Question ${idx}</h4>
+      ${thumb}
+      <p class="review-picks"><span class="review-wrong-pick">You chose: ${escapeHtml(you)}</span> · <span class="review-right-pick">Correct: ${escapeHtml(corr)}</span></p>
+      <div class="review-explain">${formatExplanationParagraphs(d.explanation)}</div>
+    </article>`;
+  }).join("");
 }
 
 function renderReading(tierKey) {
   const data = READING_BY_TIER[tierKey];
   const body = document.getElementById("reading-body");
   body.innerHTML = `<p class="track-intro"><strong>${escapeHtml(data.title)}</strong> — ${escapeHtml(data.subtitle)}</p>`;
-  data.sections.forEach((sec) => {
-    const h4 = document.createElement("h4");
-    h4.textContent = sec.heading;
-    const wrap = document.createElement("div");
-    wrap.innerHTML = sec.html;
-    body.appendChild(h4);
-    body.appendChild(wrap);
+  data.sections.forEach(sec => {
+    const h4  = document.createElement("h4"); h4.textContent = sec.heading;
+    const wrap = document.createElement("div"); wrap.innerHTML = sec.html;
+    body.appendChild(h4); body.appendChild(wrap);
   });
 }
 
 function configureResultsActions() {
-  const primary = document.getElementById("btn-results-primary");
+  const primary   = document.getElementById("btn-results-primary");
   const secondary = document.getElementById("btn-results-secondary");
   secondary.hidden = true;
 
-  if (state.level === "graduate") {
-    primary.textContent = "Back to home";
+  const data = cur();
+
+  if (data.completed) {
+    primary.textContent = state.level === "beginner" && intermediateUnlocked() && !state.levelData.intermediate.completed
+      ? "Go to Intermediate →"
+      : "Back to home";
     primary.hidden = false;
-    secondary.hidden = true;
     return;
   }
 
@@ -352,16 +365,12 @@ function configureResultsActions() {
 
   if (lastQuizKind === "checkpoint") {
     if (lastCheckpointPassed) {
-      if (state.level === "beginner" && state.stars === 3) {
-        primary.textContent = "Level up to Intermediate";
-        primary.hidden = false;
-      } else if (state.level === "intermediate" && state.stars === 3) {
-        primary.textContent = "Complete course";
-        primary.hidden = false;
+      if (data.stars === 3) {
+        primary.textContent = state.level === "beginner" ? "Level up to Intermediate →" : "Complete course 🎉";
       } else {
-        primary.textContent = `Continue to module track ${state.stars + 1} of 3`;
-        primary.hidden = false;
+        primary.textContent = `Continue to module track ${data.stars + 1} of 3`;
       }
+      primary.hidden = false;
     } else {
       primary.textContent = "Review this module track again";
       primary.hidden = false;
@@ -373,63 +382,41 @@ function configureResultsActions() {
 
 function applyResultsCopy() {
   const { correct, total, pct } = lastScore;
-  const tier = tierForPercent(pct);
   document.getElementById("score-line").textContent = `${correct} / ${total} correct (${pct}%)`;
-
-  const tierLabels = {
-    foundation: "Growing observer",
-    intermediate: "Solid instincts",
-    expert: "Sharp eye — stay humble",
-  };
-  document.getElementById("tier-label").textContent = tierLabels[tier];
+  const tierLabels = { foundation: "Growing observer", intermediate: "Solid instincts", expert: "Sharp eye — stay humble" };
+  document.getElementById("tier-label").textContent = tierLabels[tierForPercent(pct)];
 
   const starAward = document.getElementById("star-award");
-  const starText = document.getElementById("star-award-text");
-  if (
-    state.level !== "graduate" &&
-    lastQuizKind === "checkpoint" &&
-    lastCheckpointPassed
-  ) {
+  const starText  = document.getElementById("star-award-text");
+  const data = cur();
+  if (lastQuizKind === "checkpoint" && lastCheckpointPassed) {
     starAward.hidden = false;
-    starText.textContent = `Golden star ${state.stars} of 3 on ${LEVEL_LABELS[state.level]}.`;
+    starText.textContent = `Golden star ${data.stars} of 3 on ${LEVEL_LABELS[state.level]}!`;
   } else {
     starAward.hidden = true;
-    starText.textContent = "";
   }
 
   let blurb = "";
-  if (state.level === "graduate") {
-    blurb = "Practice run — your course progress is already complete. Use this to stay sharp.";
+  if (data.completed) {
+    blurb = `You've completed the ${LEVEL_LABELS[state.level]} path! All 3 stars earned.`;
   } else if (lastQuizKind === "baseline") {
-    blurb =
-      "Opening quiz logged. Read anything you missed below, skim your reading track, then continue into module track 1.";
+    blurb = "Opening quiz done. Read anything you missed, then head into module track 1.";
   } else if (lastCheckpointPassed) {
-    blurb = `Checkpoint passed — you earned a golden star. (${lastStarThreshold}+ / ${lastScore.total} required on this quiz.)`;
-    if (state.stars === 3) {
-      blurb +=
-        state.level === "beginner"
-          ? " Three stars on Beginner — you can move up to Intermediate next."
-          : " That was your third Intermediate star — you’ve completed this course path.";
-    }
+    blurb = `Checkpoint passed — star earned! (${lastStarThreshold}+ / ${total} required.)`;
+    if (data.stars === 3) blurb += state.level === "beginner" ? " Ready to level up to Intermediate!" : " You've finished the whole course!";
   } else {
-    blurb = `You need at least ${lastStarThreshold} correct on this checkpoint (${lastScore.total} questions) to earn the star. Revisit the modules, then retry.`;
+    blurb = `Need ${lastStarThreshold}+ correct (${total} questions) for a star. Revisit the modules, then retry.`;
   }
-
   document.getElementById("tier-blurb").textContent = blurb;
 }
 
+// ── Event listeners ──
+
 document.getElementById("btn-home-primary").addEventListener("click", () => {
-  if (state.level === "graduate") {
-    startBaselineQuiz();
-    return;
-  }
-  if (!state.baselineDone) {
-    startBaselineQuiz();
-    return;
-  }
-  if (state.stars < 3) {
-    openModuleTrack(state.stars + 1);
-  }
+  const data = cur();
+  if (data.completed) { startBaselineQuiz(); return; }
+  if (!data.baselineDone) { startBaselineQuiz(); return; }
+  if (data.stars < 3) { openModuleTrack(data.stars + 1); }
 });
 
 function resetProgress() {
@@ -448,7 +435,7 @@ document.getElementById("btn-module-next").addEventListener("click", () => {
   const tracks = getModuleTracks();
   const slides = tracks[activeModuleTrack - 1] || [];
   if (moduleSlideIndex < slides.length - 1) {
-    moduleSlideIndex += 1;
+    moduleSlideIndex++;
     renderModuleSlide();
     return;
   }
@@ -457,23 +444,21 @@ document.getElementById("btn-module-next").addEventListener("click", () => {
 
 document.getElementById("quiz-form").addEventListener("submit", (e) => {
   e.preventDefault();
-  const form = e.target;
-  const { correct, total, details } = scoreForm(form, activeQuizItems);
+  const { correct, total, details } = scoreForm(e.target, activeQuizItems);
   const pct = Math.round((correct / total) * 100);
   lastScore = { correct, total, pct };
-  const tier = tierForPercent(pct);
 
-  lastStarThreshold = starThresholdForQuiz(activeQuizItems);
+  lastStarThreshold  = starThresholdForQuiz(activeQuizItems);
   lastCheckpointPassed = lastQuizKind === "checkpoint" && correct >= lastStarThreshold;
 
-  if (state.level !== "graduate") {
-    if (lastQuizKind === "baseline") {
-      state.baselineDone = true;
-      saveState();
-    } else if (lastQuizKind === "checkpoint" && lastCheckpointPassed) {
-      state.stars = Math.min(3, state.stars + 1);
-      saveState();
-    }
+  const data = cur();
+  if (lastQuizKind === "baseline") {
+    data.baselineDone = true;
+    saveState();
+  } else if (lastQuizKind === "checkpoint" && lastCheckpointPassed) {
+    data.stars = Math.min(3, data.stars + 1);
+    if (data.stars === 3) data.completed = true;
+    saveState();
   }
 
   if (pct === 100) {
@@ -485,69 +470,69 @@ document.getElementById("quiz-form").addEventListener("submit", (e) => {
   }
 
   document.getElementById("reading-body").innerHTML = "";
-  renderReading(tier);
+  renderReading(tierForPercent(pct));
   renderWrongReview(details, activeQuizItems);
-
   applyResultsCopy();
   configureResultsActions();
   renderProgressStrip();
-
   showPanel("screen-results");
   requestAnimationFrame(() => window.scrollTo(0, 0));
 });
 
 document.getElementById("btn-results-primary").addEventListener("click", () => {
   document.getElementById("review-card").hidden = true;
-  document.getElementById("star-award").hidden = true;
+  document.getElementById("star-award").hidden  = true;
+  const data = cur();
 
-  if (state.level === "graduate") {
-    showPanel("screen-home");
-    renderHome();
-    requestAnimationFrame(() => window.scrollTo(0, 0));
-    return;
-  }
-
-  if (lastQuizKind === "baseline") {
-    openModuleTrack(1);
-    return;
-  }
-
-  if (lastQuizKind === "checkpoint" && lastCheckpointPassed) {
-    if (state.level === "beginner" && state.stars === 3) {
+  if (data.completed) {
+    if (state.level === "beginner") {
+      // unlock and switch to intermediate
+      state.level = "intermediate";
+      saveState();
       showPanel("screen-levelup");
       document.getElementById("levelup-body").textContent =
-        "You collected three golden stars on the Beginner path. Intermediate adds new modules and three more checkpoints—the same rhythm, harder habits.";
+        "You collected 3 golden stars on Beginner. Intermediate has new modules and trickier questions — same rhythm, harder habits.";
       requestAnimationFrame(() => window.scrollTo(0, 0));
-      return;
-    }
-    if (state.level === "intermediate" && state.stars === 3) {
-      state.level = "graduate";
-      saveState();
+    } else {
       showPanel("screen-home");
       renderHome();
       requestAnimationFrame(() => window.scrollTo(0, 0));
-      return;
     }
-    openModuleTrack(state.stars + 1);
+    return;
+  }
+
+  if (lastQuizKind === "baseline") { openModuleTrack(1); return; }
+
+  if (lastQuizKind === "checkpoint" && lastCheckpointPassed) {
+    if (data.stars < 3) { openModuleTrack(data.stars + 1); return; }
+    // stars just hit 3 — completed flag already set
+    if (state.level === "beginner") {
+      state.level = "intermediate";
+      saveState();
+      showPanel("screen-levelup");
+      document.getElementById("levelup-body").textContent =
+        "You collected 3 golden stars on Beginner! Intermediate is now unlocked — same rhythm, harder questions.";
+      requestAnimationFrame(() => window.scrollTo(0, 0));
+    } else {
+      showPanel("screen-home");
+      renderHome();
+      requestAnimationFrame(() => window.scrollTo(0, 0));
+    }
     return;
   }
 
   if (lastQuizKind === "checkpoint" && !lastCheckpointPassed) {
-    openModuleTrack(state.stars + 1);
-    return;
+    openModuleTrack(data.stars + 1);
   }
 });
 
 document.getElementById("btn-results-secondary").addEventListener("click", () => {
   document.getElementById("review-card").hidden = true;
-  document.getElementById("star-award").hidden = true;
+  document.getElementById("star-award").hidden  = true;
   startCheckpointQuiz();
 });
 
 document.getElementById("btn-levelup-ok").addEventListener("click", () => {
-  state.level = "intermediate";
-  state.stars = 0;
-  state.baselineDone = false;
   saveState();
   renderProgressStrip();
   startBaselineQuiz();
