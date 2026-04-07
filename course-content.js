@@ -124,6 +124,154 @@ const IMG_AI_HARD = svgDataUrl(`
   <rect width="480" height="320" fill="#f8fafc" filter="url(#film)" opacity="0.24"/>
 </svg>`);
 
+/* ── Intermediate / Advanced synthetic images (never shown in beginner) ── */
+
+const IMG_SYN_KITCHEN = svgDataUrl(`
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 320">
+  <defs>
+    <linearGradient id="kwall" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f5f0e8"/><stop offset="1" stop-color="#e0d6c4"/>
+    </linearGradient>
+    <linearGradient id="kcab" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#c8b89a"/><stop offset="1" stop-color="#a08060"/>
+    </linearGradient>
+    <linearGradient id="kcount" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d0ccc8"/><stop offset="0.4" stop-color="#b8b4b0"/><stop offset="1" stop-color="#909090"/>
+    </linearGradient>
+    <filter id="kgrain">
+      <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" seed="17" result="n"/>
+      <feColorMatrix in="n" type="saturate" values="0"/><feComponentTransfer><feFuncA type="linear" slope="0.13"/></feComponentTransfer>
+    </filter>
+    <filter id="kglow"><feGaussianBlur stdDeviation="3.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  </defs>
+  <rect width="480" height="320" fill="url(#kwall)"/>
+  <rect x="0" y="60" width="480" height="130" fill="url(#kcab)" opacity="0.9"/>
+  <rect x="8" y="65" width="88" height="118" rx="2" fill="#b8a080" stroke="#9a7a55" stroke-width="1.5"/>
+  <rect x="104" y="65" width="88" height="118" rx="2" fill="#b8a080" stroke="#9a7a55" stroke-width="1.5"/>
+  <rect x="200" y="65" width="88" height="118" rx="2" fill="#b8a080" stroke="#9a7a55" stroke-width="1.5"/>
+  <rect x="296" y="65" width="88" height="118" rx="2" fill="#b8a080" stroke="#9a7a55" stroke-width="1.5"/>
+  <rect x="392" y="65" width="80" height="118" rx="2" fill="#b8a080" stroke="#9a7a55" stroke-width="1.5"/>
+  <circle cx="48" cy="124" r="4" fill="#8a7060"/><circle cx="144" cy="124" r="4" fill="#8a7060"/>
+  <circle cx="240" cy="124" r="4" fill="#8a7060"/><circle cx="336" cy="124" r="4" fill="#8a7060"/>
+  <rect x="0" y="190" width="480" height="28" fill="url(#kcount)"/>
+  <rect x="0" y="215" width="480" height="105" fill="#e8e0d4"/>
+  <rect x="30" y="228" width="80" height="60" rx="2" fill="#c8c0b8" opacity="0.8"/>
+  <ellipse cx="320" cy="200" rx="38" ry="8" fill="#d0c8c0" opacity="0.6"/>
+  <rect x="295" y="170" width="50" height="34" rx="3" fill="#c8c4c0" opacity="0.9"/>
+  <rect x="0" y="0" width="480" height="65" fill="url(#kwall)"/>
+  <rect x="160" y="8" width="160" height="52" rx="2" fill="#b8a860" opacity="0.55" filter="url(#kglow)"/>
+  <rect width="480" height="320" filter="url(#kgrain)"/>
+</svg>`);
+
+const IMG_SYN_PORTRAIT = svgDataUrl(`
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 320">
+  <defs>
+    <radialGradient id="pbg" cx="50%" cy="42%" r="62%">
+      <stop offset="0" stop-color="#c8b8a8"/><stop offset="0.6" stop-color="#8a7060"/><stop offset="1" stop-color="#3a2820"/>
+    </radialGradient>
+    <radialGradient id="pface" cx="50%" cy="44%" r="50%">
+      <stop offset="0" stop-color="#f0d8c0"/><stop offset="0.5" stop-color="#e0c0a0"/><stop offset="1" stop-color="#b89070"/>
+    </radialGradient>
+    <radialGradient id="pglow" cx="42%" cy="30%" r="40%">
+      <stop offset="0" stop-color="#fff8f0" stop-opacity="0.7"/><stop offset="1" stop-color="#fff8f0" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="psmooth"><feGaussianBlur stdDeviation="2.2"/></filter>
+    <filter id="pgrain2">
+      <feTurbulence type="fractalNoise" baseFrequency="0.68" numOctaves="4" seed="55" result="n"/>
+      <feColorMatrix in="n" type="saturate" values="0"/><feComponentTransfer><feFuncA type="linear" slope="0.11"/></feComponentTransfer>
+    </filter>
+  </defs>
+  <rect width="480" height="320" fill="url(#pbg)"/>
+  <ellipse cx="240" cy="310" rx="155" ry="58" fill="#1a1008" opacity="0.55" filter="url(#psmooth)"/>
+  <ellipse cx="240" cy="170" rx="100" ry="130" fill="url(#pface)"/>
+  <ellipse cx="240" cy="152" rx="74" ry="86" fill="url(#pface)"/>
+  <rect x="172" y="218" width="136" height="102" fill="#e0c8b0" opacity="0.4"/>
+  <ellipse cx="240" cy="320" rx="100" ry="38" fill="#d4b898" opacity="0.5"/>
+  <ellipse cx="210" cy="145" rx="14" ry="9" fill="#3a2420" opacity="0.85"/>
+  <ellipse cx="270" cy="145" rx="14" ry="9" fill="#3a2420" opacity="0.85"/>
+  <ellipse cx="210" cy="143" rx="6" ry="5" fill="#1a1010"/>
+  <ellipse cx="270" cy="143" rx="6" ry="5" fill="#1a1010"/>
+  <path d="M 220 175 Q 240 185 260 175" stroke="#c08070" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <ellipse cx="240" cy="116" rx="68" ry="28" fill="#3a2820" opacity="0.9"/>
+  <rect width="480" height="320" fill="url(#pglow)"/>
+  <rect width="480" height="320" filter="url(#pgrain2)"/>
+</svg>`);
+
+const IMG_SYN_MOUNTAIN = svgDataUrl(`
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 320">
+  <defs>
+    <linearGradient id="msky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#b8d4f0"/><stop offset="0.55" stop-color="#d8eaf8"/><stop offset="1" stop-color="#f0f8ff"/>
+    </linearGradient>
+    <linearGradient id="mmtn" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f8f8f8"/><stop offset="0.25" stop-color="#c8c8d0"/><stop offset="1" stop-color="#6878a0"/>
+    </linearGradient>
+    <linearGradient id="mmtn2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e0e0e8"/><stop offset="1" stop-color="#8090b0"/>
+    </linearGradient>
+    <linearGradient id="mground" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#7a9860"/><stop offset="1" stop-color="#485830"/>
+    </linearGradient>
+    <filter id="mgrain">
+      <feTurbulence type="fractalNoise" baseFrequency="0.6" numOctaves="3" seed="29" result="n"/>
+      <feColorMatrix in="n" type="saturate" values="0"/><feComponentTransfer><feFuncA type="linear" slope="0.16"/></feComponentTransfer>
+    </filter>
+  </defs>
+  <rect width="480" height="320" fill="url(#msky)"/>
+  <ellipse cx="200" cy="580" rx="420" ry="420" fill="#e8f4f8" opacity="0.4"/>
+  <polygon points="240,38 380,210 100,210" fill="url(#mmtn)"/>
+  <polygon points="360,72 480,210 240,210" fill="url(#mmtn2)" opacity="0.92"/>
+  <polygon points="80,96 220,210 0,210 0,250" fill="url(#mmtn2)" opacity="0.75"/>
+  <polygon points="240,38 276,80 240,75 204,80" fill="#f8f8fc" opacity="0.9"/>
+  <polygon points="360,72 390,108 360,104 330,108" fill="#f0f0f8" opacity="0.85"/>
+  <rect x="0" y="208" width="480" height="112" fill="url(#mground)"/>
+  <ellipse cx="240" cy="212" rx="200" ry="14" fill="#5a7840" opacity="0.5"/>
+  <rect x="60" y="195" width="12" height="28" fill="#3a5020"/><polygon points="66,170 54,200 78,200" fill="#4a6828"/>
+  <rect x="380" y="188" width="10" height="35" fill="#3a5020"/><polygon points="385,160 375,195 395,195" fill="#4a6828"/>
+  <rect width="480" height="320" filter="url(#mgrain)"/>
+</svg>`);
+
+const IMG_SYN_OFFICE = svgDataUrl(`
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 320">
+  <defs>
+    <linearGradient id="owall" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e8edf4"/><stop offset="1" stop-color="#cdd5e0"/>
+    </linearGradient>
+    <linearGradient id="odesk" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#b8a890"/><stop offset="1" stop-color="#90806a"/>
+    </linearGradient>
+    <linearGradient id="oscreen" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1a2a4a"/><stop offset="1" stop-color="#0d1828"/>
+    </linearGradient>
+    <filter id="ograin">
+      <feTurbulence type="fractalNoise" baseFrequency="0.7" numOctaves="3" seed="41" result="n"/>
+      <feColorMatrix in="n" type="saturate" values="0"/><feComponentTransfer><feFuncA type="linear" slope="0.14"/></feComponentTransfer>
+    </filter>
+    <filter id="oglow2"><feGaussianBlur stdDeviation="4"/></filter>
+  </defs>
+  <rect width="480" height="320" fill="url(#owall)"/>
+  <rect x="30" y="20" width="160" height="118" rx="3" fill="#c8d0dc" stroke="#a0aab8" stroke-width="1.5"/>
+  <rect x="35" y="25" width="150" height="108" fill="url(#oscreen)"/>
+  <rect x="45" y="35" width="130" height="8" rx="1" fill="#4a6890" opacity="0.7"/>
+  <rect x="45" y="50" width="100" height="5" rx="1" fill="#3a5878" opacity="0.5"/>
+  <rect x="45" y="60" width="120" height="5" rx="1" fill="#3a5878" opacity="0.45"/>
+  <rect x="45" y="70" width="90" height="5" rx="1" fill="#3a5878" opacity="0.4"/>
+  <rect x="45" y="82" width="58" height="28" rx="2" fill="#2a7aff" opacity="0.6"/>
+  <rect x="100" y="10" width="4" height="15" fill="#a0aab8"/>
+  <ellipse cx="102" cy="8" rx="18" ry="6" fill="#b0bac8"/>
+  <rect x="260" y="18" width="190" height="130" rx="3" fill="#c8d0dc" stroke="#a0aab8" stroke-width="1.5"/>
+  <rect x="265" y="23" width="180" height="120" fill="url(#oscreen)"/>
+  <rect x="278" y="35" width="80" height="80" rx="2" fill="#1a3a6a" opacity="0.8"/>
+  <rect x="368" y="35" width="68" height="36" rx="1" fill="#3a5878" opacity="0.5"/>
+  <rect x="368" y="78" width="68" height="36" rx="1" fill="#2a4868" opacity="0.5"/>
+  <rect x="0" y="195" width="480" height="28" fill="url(#odesk)"/>
+  <rect x="0" y="220" width="480" height="100" fill="#d4cabb"/>
+  <rect x="160" y="155" width="60" height="44" rx="2" fill="#a0aab0" opacity="0.8"/>
+  <rect x="155" y="196" width="70" height="5" rx="1" fill="#888898"/>
+  <ellipse cx="240" cy="199" rx="180" ry="12" fill="#000" opacity="0.1" filter="url(#oglow2)"/>
+  <rect width="480" height="320" filter="url(#ograin)"/>
+</svg>`);
+
 const PHOTO = (seed) => `https://picsum.photos/seed/${seed}/480/320`;
 
 const CHECKPOINT_TITLES = {
@@ -298,17 +446,17 @@ const QUIZ_BASELINE_INTERMEDIATE = withIds("base_i", [
   },
   {
     kind: "image",
-    imageSrc: PHOTO("realboats81"),
-    imageAlt: "Harbor with boats and ropes",
+    imageSrc: PHOTO("intlake66"),
+    imageAlt: "Lake with reflections and shoreline",
     answer: "human",
-    explanation: "Ropes, reflections, random boat angles — all that tangled detail is exactly what a camera captures and what fake images skip.",
+    explanation: "The rippled reflections and uneven shoreline are exactly the kind of messy real detail that cameras capture naturally — and that generated images tend to flatten.",
   },
   {
     kind: "image",
-    imageSrc: IMG_SYN_STREET,
-    imageAlt: "City street at dusk",
+    imageSrc: IMG_SYN_MOUNTAIN,
+    imageAlt: "Mountain landscape at midday",
     answer: "ai",
-    explanation: "The buildings are perfectly spaced rectangles, the sky fades too cleanly, and the 'reflection' is just a simple shape. Real city streets are way messier.",
+    explanation: "The mountain is a perfect triangle, the sky gradient is too smooth, and the treeline is symmetrical. Real landscapes have irregular ridges, haze, and random detail.",
   },
   {
     kind: "text",
@@ -324,10 +472,10 @@ const QUIZ_BASELINE_INTERMEDIATE = withIds("base_i", [
   },
   {
     kind: "image",
-    imageSrc: IMG_SYN_INDOOR,
-    imageAlt: "Room corner with soft window light",
+    imageSrc: IMG_SYN_KITCHEN,
+    imageAlt: "Modern kitchen with perfect cabinets",
     answer: "ai",
-    explanation: "Too clean — no outlet covers, no furniture shadows, no paint texture variation. Real rooms always have something imperfect.",
+    explanation: "The cabinets are identical rectangles, the countertop gradient is too uniform, and every surface is spotless. Real kitchens have scratches, crumbs, and mismatched items.",
   },
   {
     kind: "text",
@@ -588,10 +736,10 @@ const QUIZ_CP_INTERMEDIATE_1 = withIds("ib1", [
   },
   {
     kind: "image",
-    imageSrc: IMG_SYN_STREET,
-    imageAlt: "Night street between tall buildings",
+    imageSrc: IMG_SYN_OFFICE,
+    imageAlt: "Neat modern office workspace",
     answer: "ai",
-    explanation: "Genre cross-check: if this were used in a breaking news story, you'd want a photographer credit and outlet. Structurally it's still synthetic blocks + grain — not a raw camera file.",
+    explanation: "Genre cross-check: if this were used in a business news story, you'd want a photographer credit. The screens have no real interface, the desk has zero clutter — it's synthetic.",
   },
   {
     kind: "text",
@@ -607,10 +755,10 @@ const QUIZ_CP_INTERMEDIATE_1 = withIds("ib1", [
   },
   {
     kind: "image",
-    imageSrc: PHOTO("realdesk33"),
-    imageAlt: "Messy desk photo",
+    imageSrc: PHOTO("intcafe77"),
+    imageAlt: "Busy café interior with people",
     answer: "human",
-    explanation: "Casual documentary photo — matches real life clutter. The genre here is 'someone's actual desk,' and it looks like it.",
+    explanation: "Casual documentary photo — random seating, natural lighting, real faces at different angles. The genre is 'someone walked in with a phone,' and it looks exactly like that.",
   },
 ]);
 
@@ -624,17 +772,17 @@ const QUIZ_CP_INTERMEDIATE_2 = withIds("ib2", [
   },
   {
     kind: "image",
-    imageSrc: PHOTO("realstairs55"),
-    imageAlt: "Interior stairs photo",
+    imageSrc: PHOTO("intbridge99"),
+    imageAlt: "Old stone bridge over a river",
     answer: "human",
-    explanation: "Standalone image check: real physics, real materials, real wear. Passes the 'looks like a camera was actually there' test.",
+    explanation: "Standalone image check: real stone texture, irregular moss, uneven water reflections. Passes the 'looks like a camera was actually there' test.",
   },
   {
     kind: "image",
-    imageSrc: IMG_AI_HARD,
-    imageAlt: "Sunset silhouette image",
+    imageSrc: IMG_SYN_PORTRAIT,
+    imageAlt: "Close-up portrait of a person",
     answer: "ai",
-    explanation: "Captions can lie even about real images — and here, the pixels are synthetic too. Both the story AND the image need to check out.",
+    explanation: "The skin is too smooth with no pores or fine lines, the lighting is a perfect radial gradient, and the hair blends into the background too cleanly. Deepfake-era lesson: faces are now the hardest thing to trust.",
   },
   {
     kind: "text",
@@ -644,10 +792,10 @@ const QUIZ_CP_INTERMEDIATE_2 = withIds("ib2", [
   },
   {
     kind: "image",
-    imageSrc: IMG_SYN_INDOOR,
-    imageAlt: "Indoor scene with window light",
+    imageSrc: IMG_SYN_KITCHEN,
+    imageAlt: "Perfectly clean kitchen interior",
     answer: "ai",
-    explanation: "Even polished marketing photos have some real-world chaos — cables, shadows, uneven surfaces. This has none of that. Still synthetic.",
+    explanation: "Even polished real-estate photos have some real-world chaos — fingerprints, off-center handles, one cabinet that doesn't quite align. This kitchen has none of that.",
   },
   {
     kind: "text",
@@ -657,10 +805,10 @@ const QUIZ_CP_INTERMEDIATE_2 = withIds("ib2", [
   },
   {
     kind: "image",
-    imageSrc: PHOTO("realforest77"),
-    imageAlt: "Forest trail",
+    imageSrc: PHOTO("intmarket55"),
+    imageAlt: "Busy outdoor market scene",
     answer: "human",
-    explanation: "Depth, dappled light, organic mess. If this were captioned 'enchanted forest discovered near city,' you'd want a second source — but optically it's a real camera.",
+    explanation: "Overlapping stalls, motion blur on shoppers, uneven shadows — the chaotic depth of a real crowded place. If captioned as 'illegal market raided,' you'd want the original source before sharing.",
   },
   {
     kind: "text",
@@ -670,10 +818,10 @@ const QUIZ_CP_INTERMEDIATE_2 = withIds("ib2", [
   },
   {
     kind: "image",
-    imageSrc: IMG_SYN_FLORA,
-    imageAlt: "Soft green nature blur with stems",
+    imageSrc: IMG_SYN_MOUNTAIN,
+    imageAlt: "Serene mountain scene",
     answer: "ai",
-    explanation: "The caption is empty PR and the image is a bokeh mimic — both are faking depth they don't have.",
+    explanation: "Looks plausible as a travel photo, but the mountain is a perfect triangle, the trees are mirrored clones, and the sky fades with no clouds. Neither the caption nor the pixels add up.",
   },
   {
     kind: "text",
@@ -705,10 +853,10 @@ const QUIZ_CP_INTERMEDIATE_3 = withIds("ib3", [
   },
   {
     kind: "image",
-    imageSrc: PHOTO("realcoffee88"),
-    imageAlt: "Cafe window photo",
+    imageSrc: PHOTO("intport22"),
+    imageAlt: "Port with shipping containers and cranes",
     answer: "human",
-    explanation: "Even real photos need ethical handling — consent, context, credit. Optically real doesn't mean automatically okay to share.",
+    explanation: "Even real photos need ethical handling — consent, context, credit. Optically real (rust, uneven stacking, real depth) doesn't mean automatically okay to use as evidence.",
   },
   {
     kind: "text",
@@ -724,10 +872,10 @@ const QUIZ_CP_INTERMEDIATE_3 = withIds("ib3", [
   },
   {
     kind: "image",
-    imageSrc: IMG_SYN_STREET,
-    imageAlt: "Dusk city street with building silhouettes",
+    imageSrc: IMG_SYN_OFFICE,
+    imageAlt: "Polished corporate office with monitors",
     answer: "ai",
-    explanation: "Looks plausible as a real city photo, but it's still our synthetic street — flat buildings, smooth sky, no real street chaos. Don't use it as evidence of a real place.",
+    explanation: "Looks plausible as a tech company photo, but the screens show no real interfaces, the desk has zero clutter, and every monitor is perfectly aligned. Don't use synthetic images as evidence of a real workplace.",
   },
   {
     kind: "text",
@@ -743,10 +891,10 @@ const QUIZ_CP_INTERMEDIATE_3 = withIds("ib3", [
   },
   {
     kind: "image",
-    imageSrc: PHOTO("realwall12"),
-    imageAlt: "Wall texture macro",
+    imageSrc: PHOTO("intriver44"),
+    imageAlt: "River with rocks and current",
     answer: "human",
-    explanation: "Closing on a simple, mundane real photo — a reminder that ground truth still matters. Not everything needs to be dramatic to be real.",
+    explanation: "Closing on a simple, mundane real photo — uneven rocks, turbulent water, natural chaos. Ground truth still matters. Not everything needs to be dramatic to be real.",
   },
 ]);
 
@@ -811,10 +959,10 @@ const QUIZ_BASELINE_ADVANCED = withIds("base_a", [
   },
   {
     kind: "image",
-    imageSrc: IMG_SYN_INDOOR,
-    imageAlt: "Perfect indoor scene",
+    imageSrc: IMG_SYN_OFFICE,
+    imageAlt: "Perfect modern office",
     answer: "ai",
-    explanation: "Advanced check: no outlet covers, no scuff marks, no cable management issues, no shadows under objects. Real rooms have all of these. Absence of imperfection = synthetic.",
+    explanation: "Advanced check: every monitor is perfectly aligned, the desk has zero clutter, and the screens show no real interface content. Real offices have cables, sticky notes, and half-eaten snacks.",
   },
 ]);
 
@@ -847,10 +995,10 @@ const QUIZ_CP_ADVANCED_1 = withIds("ab1", [
   },
   {
     kind: "image",
-    imageSrc: IMG_SYN_FLORA,
-    imageAlt: "Soft nature scene",
+    imageSrc: IMG_SYN_PORTRAIT,
+    imageAlt: "Close-up portrait of a face",
     answer: "ai",
-    explanation: "Advanced reminder: even 'nature' images can be fully synthetic. The blur distribution is mathematically even — real bokeh has optical physics behind it that's harder to fake.",
+    explanation: "Advanced reminder: synthetic faces are now the hardest thing to detect. The skin is suspiciously smooth, the lighting is a perfect radial gradient, and there are no pores or asymmetries. Real portrait photography always has these.",
   },
   {
     kind: "text",
@@ -879,10 +1027,10 @@ const QUIZ_CP_ADVANCED_1 = withIds("ab1", [
   },
   {
     kind: "image",
-    imageSrc: IMG_SYN_STREET,
-    imageAlt: "City street scene",
+    imageSrc: IMG_SYN_KITCHEN,
+    imageAlt: "Spotless modern kitchen",
     answer: "ai",
-    explanation: "Still our synthetic city — but at this level, check: would you accept this as evidence in a serious context? Always ask for source + provenance before using any image as proof.",
+    explanation: "Would you accept this as evidence in a serious context? At this level: always ask for source + provenance. The kitchen also has zero imperfections — cabinets identical, counters pristine, no items out of place.",
   },
 ]);
 
@@ -947,10 +1095,10 @@ const QUIZ_CP_ADVANCED_2 = withIds("ab2", [
   },
   {
     kind: "image",
-    imageSrc: IMG_SYN_FLORA,
-    imageAlt: "Blurred green nature",
+    imageSrc: IMG_SYN_MOUNTAIN,
+    imageAlt: "Perfect mountain landscape",
     answer: "ai",
-    explanation: "Provenance test: no photographer, no camera, no date, no location. The image itself also shows AI tells. Two layers of evidence pointing the same way.",
+    explanation: "Provenance test: no photographer, no location tag, no camera metadata. The image also shows AI tells — perfect triangle peak, symmetrical treeline, no haze or atmospheric variation. Two layers of evidence.",
   },
 ]);
 
@@ -989,10 +1137,10 @@ const QUIZ_CP_ADVANCED_3 = withIds("ab3", [
   },
   {
     kind: "image",
-    imageSrc: IMG_SYN_INDOOR,
-    imageAlt: "Clean indoor space",
+    imageSrc: IMG_SYN_PORTRAIT,
+    imageAlt: "Polished portrait photo",
     answer: "ai",
-    explanation: "AI-generated rooms still appear in real estate listings, hotel ads, and news articles. The stakes of not checking: you might book a room that doesn't exist.",
+    explanation: "AI-generated faces still appear in fake news articles, social media profiles, and product reviews. The stakes of not checking: you might trust someone who doesn't exist.",
   },
   {
     kind: "text",
