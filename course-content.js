@@ -137,6 +137,11 @@ const CHECKPOINT_TITLES = {
     "Round 2 · Images + captions: do they match?",
     "Round 3 · Stay humble, stay safe",
   ],
+  advanced: [
+    "Round 1 · Deepfakes & synthetic faces",
+    "Round 2 · Provenance & verification",
+    "Round 3 · AI in the wild",
+  ],
 };
 
 const READING_BY_TIER = {
@@ -745,9 +750,281 @@ const QUIZ_CP_INTERMEDIATE_3 = withIds("ib3", [
   },
 ]);
 
+/** Opening quiz — Advanced */
+const QUIZ_BASELINE_ADVANCED = withIds("base_a", [
+  {
+    kind: "text",
+    passage: "This video of the senator was analyzed by three independent forensic labs — all three flagged unnatural blinking patterns and ear-region artifacts consistent with GAN-based face synthesis.",
+    answer: "human",
+    explanation: "Real forensic analysis language: multiple independent labs, specific artifacts named, specific technique cited. This is how actual experts write reports.",
+  },
+  {
+    kind: "text",
+    passage: "Shocking leaked audio reveals the CEO saying things you won't believe — no transcript, no source, just hit play.",
+    answer: "ai",
+    explanation: "No transcript, no source, urgency + mystery = classic audio manipulation bait. Real leaked audio comes with at minimum a claim of where it came from.",
+  },
+  {
+    kind: "image",
+    imageSrc: PHOTO("realcrowd44"),
+    imageAlt: "Crowd at an outdoor event",
+    answer: "human",
+    explanation: "Real crowd photo — hundreds of unique faces, random clothing, natural lighting inconsistencies. Generating a convincing crowd this size is still extremely hard for AI.",
+  },
+  {
+    kind: "text",
+    passage: "The C2PA content credential attached to this image shows it was captured by a Nikon Z9 at 14:32 UTC on March 2, 2026, with no post-processing edits recorded.",
+    answer: "human",
+    explanation: "C2PA is a real standard for content provenance. Specific camera, exact timestamp, provenance chain — this is what verified media actually looks like.",
+  },
+  {
+    kind: "image",
+    imageSrc: IMG_AI_HARD,
+    imageAlt: "Dramatic sunset scene",
+    answer: "ai",
+    explanation: "Still our synthetic sunset — but at the advanced level, the lesson is: even when you're unsure, ask for the provenance chain before trusting it as evidence.",
+  },
+  {
+    kind: "text",
+    passage: "Voice clone detected: the pitch consistency is too perfect across 4 minutes with zero fatigue markers, and formant transitions between phonemes don't match this speaker's baseline recording.",
+    answer: "human",
+    explanation: "Real audio forensics vocabulary — fatigue markers, formant transitions, baseline comparison. Experts write precisely like this. Don't mistake technical language for AI.",
+  },
+  {
+    kind: "text",
+    passage: "AI-generated content is now so advanced that no human can ever reliably detect it — give up trying.",
+    answer: "ai",
+    explanation: "Absolute claim + defeatism. Neither is true. Detection is hard and imperfect, but humans + tools + provenance systems together do meaningfully better than chance.",
+  },
+  {
+    kind: "image",
+    imageSrc: PHOTO("realstreet99"),
+    imageAlt: "Busy street scene with people",
+    answer: "human",
+    explanation: "Real street photo — motion blur on some pedestrians, varied focus, natural depth of field. AI still struggles with the physics of a moving scene.",
+  },
+  {
+    kind: "text",
+    passage: "We ran the image through Hive Moderation, FotoForensics ELA, and checked the EXIF — no GPS, camera model listed as 'unknown,' and pixel-level ELA shows heavy re-compression in the face region.",
+    answer: "human",
+    explanation: "Named real tools, described real workflow, specific anomaly found. This is what actual verification looks like — messy, tool-dependent, specific.",
+  },
+  {
+    kind: "image",
+    imageSrc: IMG_SYN_INDOOR,
+    imageAlt: "Perfect indoor scene",
+    answer: "ai",
+    explanation: "Advanced check: no outlet covers, no scuff marks, no cable management issues, no shadows under objects. Real rooms have all of these. Absence of imperfection = synthetic.",
+  },
+]);
+
+/** Advanced checkpoint 1 — Deepfakes & synthetic faces */
+const QUIZ_CP_ADVANCED_1 = withIds("ab1", [
+  {
+    kind: "text",
+    passage: "Her eyes don't blink for 11 seconds straight and the lighting on her neck doesn't match the room behind her — that's two independent flags.",
+    answer: "human",
+    explanation: "Real deepfake analysis: specific duration, specific mismatch, two independent tells stacked. This is exactly how you should reason about video.",
+  },
+  {
+    kind: "text",
+    passage: "This is definitely a deepfake — you can just tell by looking at it.",
+    answer: "ai",
+    explanation: "Zero evidence, zero specific tells. 'You can just tell' is not a method. Anyone at the advanced level should be suspicious of this reasoning.",
+  },
+  {
+    kind: "image",
+    imageSrc: PHOTO("realface11"),
+    imageAlt: "Portrait photo outdoors",
+    answer: "human",
+    explanation: "Real portrait — skin pores visible at high resolution, hair strands with natural variation, catchlights in eyes are asymmetric as they would be in real light.",
+  },
+  {
+    kind: "text",
+    passage: "GAN-generated faces typically show: symmetrical catchlights, smooth skin in background-adjacent areas, and occasional teeth/earring rendering errors.",
+    answer: "human",
+    explanation: "Accurate technical description of known GAN tells. This is real AI literacy content — it names specific, checkable patterns rather than vibes.",
+  },
+  {
+    kind: "image",
+    imageSrc: IMG_SYN_FLORA,
+    imageAlt: "Soft nature scene",
+    answer: "ai",
+    explanation: "Advanced reminder: even 'nature' images can be fully synthetic. The blur distribution is mathematically even — real bokeh has optical physics behind it that's harder to fake.",
+  },
+  {
+    kind: "text",
+    passage: "The audio deepfake was convincing until we ran spectral analysis — the prosody was flat in a way that real emotional speech never is.",
+    answer: "human",
+    explanation: "Prosody (the rhythm and intonation of speech) is one of the hardest things for voice cloners to get right. This is a real, checkable tell.",
+  },
+  {
+    kind: "image",
+    imageSrc: PHOTO("realmarket55"),
+    imageAlt: "Street market scene",
+    answer: "human",
+    explanation: "Real market — imperfect signage, varied product placement, people at different stages of motion. AI generates markets that look too 'curated.'",
+  },
+  {
+    kind: "text",
+    passage: "If someone sends you a voice message that sounds urgent and slightly 'off' — even from a known contact — call them back on a number you already have before acting.",
+    answer: "human",
+    explanation: "Practical, specific advice for voice clone scams. Real safety advice acknowledges that even known voices can be cloned and gives a concrete verification step.",
+  },
+  {
+    kind: "text",
+    passage: "Deepfake technology is only used by bad actors and governments — regular people never encounter it.",
+    answer: "ai",
+    explanation: "False and vague. Deepfake apps are widely available to anyone with a smartphone. Framing it as only a nation-state problem makes people less vigilant.",
+  },
+  {
+    kind: "image",
+    imageSrc: IMG_SYN_STREET,
+    imageAlt: "City street scene",
+    answer: "ai",
+    explanation: "Still our synthetic city — but at this level, check: would you accept this as evidence in a serious context? Always ask for source + provenance before using any image as proof.",
+  },
+]);
+
+/** Advanced checkpoint 2 — Provenance & verification */
+const QUIZ_CP_ADVANCED_2 = withIds("ab2", [
+  {
+    kind: "text",
+    passage: "The image has a valid C2PA manifest signed by Reuters, showing original capture timestamp, no cropping, and camera model matching their field kit.",
+    answer: "human",
+    explanation: "C2PA (Coalition for Content Provenance and Authenticity) is a real standard. Named news org, specific fields verified, camera match — this is the gold standard for image provenance.",
+  },
+  {
+    kind: "text",
+    passage: "Reverse image search shows this 'breaking news' photo first appeared in a stock photo collection in 2019 — three years before the event it's being used to illustrate.",
+    answer: "human",
+    explanation: "Reverse image search catching a recycled photo — a classic and effective verification technique. This is exactly how fact-checkers work.",
+  },
+  {
+    kind: "image",
+    imageSrc: PHOTO("reallab22"),
+    imageAlt: "Lab or workspace environment",
+    answer: "human",
+    explanation: "Real workspace — imperfect cable management, varied equipment wear, asymmetric lighting. Authenticity lives in the mess.",
+  },
+  {
+    kind: "text",
+    passage: "Error Level Analysis (ELA) highlights regions of an image that have been re-saved at different compression levels — useful for spotting composited areas.",
+    answer: "human",
+    explanation: "Accurate description of a real forensics technique. ELA is a genuine tool used by investigators — knowing what it does is part of advanced literacy.",
+  },
+  {
+    kind: "image",
+    imageSrc: IMG_AI_HARD,
+    imageAlt: "Dramatic landscape",
+    answer: "ai",
+    explanation: "Provenance check: can you find a photographer credit, camera model, or publication for this image? No? Then treat it as unverified regardless of how it looks.",
+  },
+  {
+    kind: "text",
+    passage: "This watermark proves the image is authentic — watermarks can't be faked.",
+    answer: "ai",
+    explanation: "False. Watermarks can be copied, cropped, or synthesized. A watermark is a weak signal at best — provenance chains (C2PA, EXIF, known source) are much stronger.",
+  },
+  {
+    kind: "image",
+    imageSrc: PHOTO("realbuilding77"),
+    imageAlt: "Building exterior",
+    answer: "human",
+    explanation: "Real architectural photo — weathering on concrete, uneven window reflections, natural shadow angles. Compare to AI buildings which are always suspiciously pristine.",
+  },
+  {
+    kind: "text",
+    passage: "Before using any image in a school report or presentation, run it through a reverse image search and check the earliest known source date.",
+    answer: "human",
+    explanation: "Practical, actionable advice with specific steps. This is good media literacy practice — not a vague 'be careful online' platitude.",
+  },
+  {
+    kind: "text",
+    passage: "AI-generated images always fail reverse image search — so if search finds results, the image must be real.",
+    answer: "ai",
+    explanation: "Wrong on both counts. AI images can appear in search if they've been shared before. And real images can fail to appear if they're new or obscure. Neither direction is reliable alone.",
+  },
+  {
+    kind: "image",
+    imageSrc: IMG_SYN_FLORA,
+    imageAlt: "Blurred green nature",
+    answer: "ai",
+    explanation: "Provenance test: no photographer, no camera, no date, no location. The image itself also shows AI tells. Two layers of evidence pointing the same way.",
+  },
+]);
+
+/** Advanced checkpoint 3 — AI in the wild */
+const QUIZ_CP_ADVANCED_3 = withIds("ab3", [
+  {
+    kind: "text",
+    passage: "This news article has no byline, no publication date, no editor credit, and every quote is attributed to 'industry experts' with no names.",
+    answer: "ai",
+    explanation: "Missing byline + no date + vague unnamed sources = strong signals of AI-generated filler content, often used in SEO farms or low-quality news aggregators.",
+  },
+  {
+    kind: "text",
+    passage: "The study has 847 participants, was pre-registered on ClinicalTrials.gov (ID: NCT04821937), and results were replicated by a team in South Korea.",
+    answer: "human",
+    explanation: "Large sample, pre-registration (means the hypothesis was logged before results were collected), and independent replication — this is what good science actually looks like.",
+  },
+  {
+    kind: "image",
+    imageSrc: PHOTO("realcity33"),
+    imageAlt: "City skyline photo",
+    answer: "human",
+    explanation: "Real city photo — haze variation at different distances, antenna imperfections, window reflections that actually follow physics.",
+  },
+  {
+    kind: "text",
+    passage: "Using AI to write a full news article and publishing it without disclosure is considered an ethical violation by the Society of Professional Journalists.",
+    answer: "human",
+    explanation: "True and verifiable. SPJ and AP have both published guidelines on AI use in journalism. Knowing that ethics bodies exist for this is part of advanced literacy.",
+  },
+  {
+    kind: "text",
+    passage: "All AI-generated text is dangerous misinformation and should be banned from the internet immediately.",
+    answer: "ai",
+    explanation: "Absolute claim, no nuance. AI-generated text has legitimate uses — summaries, drafts, accessibility tools. The issue is undisclosed AI in contexts requiring human accountability.",
+  },
+  {
+    kind: "image",
+    imageSrc: IMG_SYN_INDOOR,
+    imageAlt: "Clean indoor space",
+    answer: "ai",
+    explanation: "AI-generated rooms still appear in real estate listings, hotel ads, and news articles. The stakes of not checking: you might book a room that doesn't exist.",
+  },
+  {
+    kind: "text",
+    passage: "I asked the chatbot to write a summary and it cited three papers — I checked all three and two of them don't exist.",
+    answer: "human",
+    explanation: "Hallucinated citations are a known, documented problem with LLMs. This person did the right thing: verified the citations. That's advanced practice.",
+  },
+  {
+    kind: "text",
+    passage: "If an AI tool is transparent about its limitations and tells you when it's uncertain, it's more trustworthy — not less.",
+    answer: "human",
+    explanation: "Correct. Calibrated uncertainty is a sign of a better-designed system. Tools that claim to always be right are more dangerous, not less.",
+  },
+  {
+    kind: "image",
+    imageSrc: PHOTO("realcoast88"),
+    imageAlt: "Coastal scene",
+    answer: "human",
+    explanation: "Real coastal photo — wave physics, foam patterns, horizon haze. AI water is getting better but still tends toward too-regular wave patterns.",
+  },
+  {
+    kind: "text",
+    passage: "Media literacy is a skill you finish learning once and then have forever.",
+    answer: "ai",
+    explanation: "False — and this is the most important lesson of the whole course. AI evolves constantly. Your skills need to evolve too. Learning never stops.",
+  },
+]);
+
 const CHECKPOINT_QUIZZES = {
-  beginner: [QUIZ_CP_BEGINNER_1, QUIZ_CP_BEGINNER_2, QUIZ_CP_BEGINNER_3],
+  beginner:     [QUIZ_CP_BEGINNER_1,     QUIZ_CP_BEGINNER_2,     QUIZ_CP_BEGINNER_3],
   intermediate: [QUIZ_CP_INTERMEDIATE_1, QUIZ_CP_INTERMEDIATE_2, QUIZ_CP_INTERMEDIATE_3],
+  advanced:     [QUIZ_CP_ADVANCED_1,     QUIZ_CP_ADVANCED_2,     QUIZ_CP_ADVANCED_3],
 };
 
 const MODULES_BY_LEVEL = {
@@ -839,15 +1116,152 @@ const MODULES_BY_LEVEL = {
       },
     ],
   ],
+  advanced: null, // filled in below after MODULES_ADVANCED is defined
 };
 
+const MODULES_ADVANCED = [
+  // Track 1: Deepfakes & Synthetic Faces (4 slides)
+  [
+    {
+      title: "Welcome to Advanced 🧠",
+      html: `<div class="module-img-wrap"><img class="module-img" src="${PHOTO('realface11')}" alt="Portrait photo" loading="lazy" /></div>
+<p>You've spotted filler text and AI images. Now the game gets harder. This level covers <strong>deepfakes, voice cloning, provenance systems, and AI in journalism</strong> — the stuff that actually fools experts.</p>
+<div class="fun-box"><strong>⚠️ The advanced challenge:</strong><br/>At this level, "it looks real to me" is not enough. You need a <em>process</em> — tools, sources, and skepticism working together.</div>
+<p>The skills here apply to real situations: news stories, social media "evidence," suspicious audio, and AI-written articles. Let's go.</p>`,
+    },
+    {
+      title: "What Is a Deepfake? 🎭",
+      html: `<p>A <strong>deepfake</strong> is a video, image, or audio clip where AI has replaced or synthesized a person's face, voice, or both. They range from obvious to nearly undetectable.</p>
+<div class="compare-wrap">
+  <div class="compare-ai"><div class="compare-label">🎭 Face swap deepfake</div>Real video of Person A, but their face is replaced with Person B's face. Used in political misinformation and non-consensual content.</div>
+  <div class="compare-ai"><div class="compare-label">🔊 Voice clone</div>AI trained on recordings of someone's voice can generate new speech in their voice — saying things they never said.</div>
+  <div class="compare-ai"><div class="compare-label">🤖 Fully synthetic person</div>No real person at all — face, voice, and body generated entirely from scratch by AI.</div>
+</div>
+<div class="fact-bubble"><strong>💡 Key tells in deepfake videos:</strong><br/>Unnatural blinking (too much or too little), lighting on face doesn't match the room, edges around hair look "soft" or "melted," and teeth/earrings render strangely.</div>`,
+    },
+    {
+      title: "Voice Cloning Is Here 🔊",
+      html: `<p>With just a few minutes of audio, AI can clone someone's voice well enough to fool their family members on a phone call. This is being used for <strong>fraud scams</strong> right now.</p>
+<div class="fun-box"><strong>📞 The grandparent scam (upgraded):</strong><br/>"Grandma, it's me, I'm in trouble, I need money now!" — except "me" is an AI voice clone of the real grandchild. Same vocal patterns, same speech quirks. Grandparents have lost thousands of dollars to this.</div>
+<div class="compare-wrap">
+  <div class="compare-human"><div class="compare-label">✅ What to do if you get a suspicious call</div>Hang up. Call back on a number you already have saved. Ask a question only the real person would know — not their name or birthday (those are public).</div>
+  <div class="compare-ai"><div class="compare-label">❌ What NOT to do</div>Act on urgency. Send money, gift cards, or wire transfers based on a voice call alone — even if it sounds exactly right.</div>
+</div>
+<p class="module-quiz-hint">🎯 Round 1 checkpoint focuses on <strong>deepfakes and synthetic faces</strong> — specific tells and real verification steps.</p>`,
+    },
+    {
+      title: "Spotting Synthetic Faces 👁️",
+      html: `<p>Here's your checklist for evaluating whether a face in an image is real or AI-generated:</p>
+<ul class="module-checklist">
+  <li data-icon="👁️">Check the <strong>eyes</strong> — catchlights (the tiny reflections) should be asymmetric in real photos. AI often makes them too symmetric.</li>
+  <li data-icon="👂">Check the <strong>ears and earrings</strong> — AI frequently renders these incorrectly, especially if they're partially obscured by hair.</li>
+  <li data-icon="🦷">Check the <strong>teeth</strong> — AI still struggles with individual tooth rendering and gum lines.</li>
+  <li data-icon="💇">Check the <strong>hair edges</strong> — against complex backgrounds, AI hair often has a "melted" or too-smooth boundary.</li>
+  <li data-icon="🌅">Check the <strong>background</strong> — does the lighting on the face match the light in the background? Mismatches = composite or deepfake.</li>
+</ul>
+<div class="try-it"><strong>🎯 Practice:</strong><br/>Search "This Person Does Not Exist" online — it generates a new AI face every time you refresh. Try applying this checklist to each one.</div>`,
+    },
+  ],
+  // Track 2: Provenance & Verification (4 slides)
+  [
+    {
+      title: "What Is Provenance? 📜",
+      html: `<div class="module-img-wrap"><img class="module-img" src="${PHOTO('reallab22')}" alt="Research workspace" loading="lazy" /></div>
+<p><strong>Provenance</strong> = where something came from, who made it, when, and what happened to it since. For digital media, provenance answers: was this image/video/text created by a human or AI, and can we verify that chain?</p>
+<div class="fact-bubble"><strong>💡 Why it matters:</strong><br/>A real photo with a false caption is just as dangerous as a fake photo. Provenance covers BOTH — the origin of the pixels AND the claim being made about them.</div>
+<p>Think of provenance like a <strong>receipt + shipping history</strong> for a piece of media. The best receipts are cryptographically signed and tamper-proof.</p>`,
+    },
+    {
+      title: "C2PA: The Content Receipt System 🧾",
+      html: `<p><strong>C2PA</strong> (Coalition for Content Provenance and Authenticity) is a real industry standard — backed by Adobe, Microsoft, BBC, and others — that attaches a signed, tamper-evident manifest to media files.</p>
+<div class="compare-wrap">
+  <div class="compare-human"><div class="compare-label">✅ What a C2PA manifest tells you</div>Camera make/model, exact capture time, GPS location, editing history, whether AI tools were used, and a cryptographic signature from the publisher.</div>
+  <div class="compare-ai"><div class="compare-label">⚠️ What C2PA doesn't solve</div>It only works if the camera/software supports it. Old photos, screenshots, and most social media shares strip it out. It's a strong signal when present — but absence isn't proof of fakery.</div>
+</div>
+<div class="try-it"><strong>🎯 Try it:</strong><br/>Search "Content Credentials verify" — Adobe has a free tool where you can upload any image and check if it has a C2PA manifest attached.</div>`,
+    },
+    {
+      title: "Your Verification Toolkit 🔧",
+      html: `<p>These are real, free tools you can use right now:</p>
+<ul class="module-checklist">
+  <li data-icon="🔍"><strong>Google Reverse Image Search</strong> — drag any image to find where it first appeared online and when.</li>
+  <li data-icon="📸"><strong>FotoForensics</strong> — free ELA (Error Level Analysis) tool that shows if parts of an image were edited at different compression levels.</li>
+  <li data-icon="📋"><strong>Jeffrey's Exif Viewer</strong> — shows hidden EXIF metadata including camera model, GPS, and timestamp.</li>
+  <li data-icon="🏷️"><strong>Content Credentials Verify</strong> (Adobe) — checks for C2PA provenance manifests.</li>
+  <li data-icon="🎵"><strong>AI Voice Detector</strong> tools — several free browser tools can analyze audio for synthesis artifacts.</li>
+</ul>
+<div class="fun-box"><strong>🔑 The golden rule:</strong><br/>No single tool is conclusive. Use two or more tools that agree before making a strong claim. One flag = investigate more. Three flags pointing the same way = high confidence.</div>`,
+    },
+    {
+      title: "When Evidence Gets Recycled 🔄",
+      html: `<div class="module-img-wrap"><img class="module-img" src="${PHOTO('realnews44')}" alt="Newspaper and media" loading="lazy" /></div>
+<p>One of the most common misinformation tactics: take a <strong>real photo from a past event</strong> and repost it as if it's happening right now.</p>
+<div class="compare-wrap">
+  <div class="compare-ai"><div class="compare-label">❌ The recycling trick</div>"Breaking: violence erupts in [city]!" — but the photo is from a 2015 event in a different country. The image is real. The claim is fake.</div>
+  <div class="compare-human"><div class="compare-label">✅ How to catch it</div>Reverse image search the photo. Check the earliest date it appears. If the photo predates the claimed event — recycled.</div>
+</div>
+<div class="fact-bubble"><strong>💡 Real example pattern:</strong><br/>During almost every major news event, fact-checkers find dozens of old, unrelated photos being shared as "current evidence." This is so common it has a name: "context collapse."</div>
+<p class="module-quiz-hint">🎯 Round 2 checkpoint tests <strong>provenance knowledge and verification tools</strong> — knowing what's real and how to check.</p>`,
+    },
+  ],
+  // Track 3: AI in the Wild (4 slides)
+  [
+    {
+      title: "AI-Written Content Is Everywhere 📰",
+      html: `<div class="module-img-wrap"><img class="module-img" src="${PHOTO('realdesk33')}" alt="Writing workspace" loading="lazy" /></div>
+<p>AI is now used to write news articles, product reviews, academic abstracts, social media posts, and entire websites — often with zero disclosure. Knowing how to spot it matters.</p>
+<div class="compare-wrap">
+  <div class="compare-ai"><div class="compare-label">🚩 Red flags for AI-written articles</div>No byline or vague byline, no publication date, all quotes from unnamed "experts," generic language that could apply to any story, no original reporting or interviews.</div>
+  <div class="compare-human"><div class="compare-label">✅ Signs of real journalism</div>Named reporter with contact info, specific sources quoted by name, original documents or data cited, contradicting viewpoints included, editor/publication credited.</div>
+</div>
+<p>The issue isn't AI assistance — it's <strong>undisclosed AI replacing human accountability</strong> in contexts where that accountability matters.</p>`,
+    },
+    {
+      title: "Hallucinations Are Real 🌀",
+      html: `<p>AI language models <strong>hallucinate</strong> — they confidently generate facts, citations, statistics, and quotes that don't exist. This isn't a bug they'll fix soon; it's a fundamental characteristic of how they work.</p>
+<div class="fun-box"><strong>📚 Real example:</strong><br/>A lawyer submitted a legal brief written by ChatGPT. It cited six court cases as precedents. A judge looked them up — none of them existed. The lawyer was fined and sanctioned.</div>
+<ul class="module-checklist">
+  <li data-icon="📖">Always verify citations from AI tools — look up the actual paper/article/case</li>
+  <li data-icon="🔢">Never trust AI-generated statistics without a primary source</li>
+  <li data-icon="💬">AI-generated quotes attributed to real people should always be verified against original sources</li>
+  <li data-icon="🗺️">AI-generated maps, diagrams, and data visualizations can contain subtle errors</li>
+</ul>`,
+    },
+    {
+      title: "AI Ethics Isn't Optional 🤝",
+      html: `<p>At the advanced level, spotting AI is only half the job. The other half is knowing what to <em>do</em> about it.</p>
+<div class="compare-wrap">
+  <div class="compare-human"><div class="compare-label">✅ Responsible use of your detection skills</div>Report AI misinformation to platforms using their reporting tools. Share fact-checks from established organizations (AP, Reuters, Snopes). Correct misinformation privately before publicly if possible.</div>
+  <div class="compare-ai"><div class="compare-label">❌ What not to do</div>Publicly accuse someone of creating deepfakes without solid evidence — you could be wrong and cause serious harm. Don't amplify content you're trying to debunk (the "ratio" problem).</div>
+</div>
+<div class="fact-bubble"><strong>💡 The amplification problem:</strong><br/>Sharing misinformation with "this is fake" still spreads it. Studies show people often remember the claim but not the correction. Link to fact-checks instead of resharing the original.</div>`,
+    },
+    {
+      title: "The Future Is Your Problem (In a Good Way) 🌍",
+      html: `<div class="module-img-wrap"><img class="module-img" src="${PHOTO('realworld88')}" alt="People working together" loading="lazy" /></div>
+<p>You've now completed all three levels of this course. Here's what you've actually learned:</p>
+<ul class="module-checklist">
+  <li data-icon="🔤"><strong>Beginner:</strong> Spot filler text, identify AI images, develop healthy sharing habits</li>
+  <li data-icon="📋"><strong>Intermediate:</strong> Read genre and context, verify captions, stay calibrated and humble</li>
+  <li data-icon="🧠"><strong>Advanced:</strong> Recognize deepfakes, use provenance tools, understand AI in journalism</li>
+</ul>
+<div class="fun-box"><strong>🚀 What comes next:</strong><br/>AI detection is a field that changes every few months. The specific tells you learned will evolve. But the <em>process</em> — stack clues, demand provenance, stay humble, update your model — never goes out of date.</div>
+<p class="module-quiz-hint">🎯 Final checkpoint: <strong>AI in the wild</strong> — journalism, hallucinations, ethics, and the big picture. You've got this! 🏆</p>`,
+    },
+  ],
+];
+
+// Wire advanced modules in now that MODULES_ADVANCED is defined
+MODULES_BY_LEVEL.advanced = MODULES_ADVANCED;
+
 function getBaselineQuizForLevel(level) {
-  if (level === "beginner") return QUIZ_BASELINE_BEGINNER;
-  return QUIZ_BASELINE_INTERMEDIATE;
+  if (level === "intermediate") return QUIZ_BASELINE_INTERMEDIATE;
+  if (level === "advanced")     return QUIZ_BASELINE_ADVANCED;
+  return QUIZ_BASELINE_BEGINNER;
 }
 
 function getCheckpointQuizForLevel(level, track1to3) {
-  const key = level === "intermediate" ? "intermediate" : "beginner";
-  const list = CHECKPOINT_QUIZZES[key][track1to3 - 1];
+  const key  = ["intermediate","advanced"].includes(level) ? level : "beginner";
+  const list = CHECKPOINT_QUIZZES[key]?.[track1to3 - 1];
   return list || CHECKPOINT_QUIZZES.beginner[0];
 }

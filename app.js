@@ -8,9 +8,11 @@ const STORAGE_KEY = "realOrAiCourseV2";
 let lastStarThreshold = 8;
 
 const LEVEL_LABELS = {
-  beginner: "Beginner",
+  beginner:     "Beginner",
   intermediate: "Intermediate",
+  advanced:     "Advanced",
 };
+const LEVEL_ORDER = ["beginner", "intermediate", "advanced"];
 
 let state = loadState();
 let lastQuizKind = "baseline";
@@ -25,8 +27,9 @@ function defaultState() {
     v: 2,
     level: "beginner",
     levelData: {
-      beginner:      { stars: 0, baselineDone: false, completed: false },
-      intermediate:  { stars: 0, baselineDone: false, completed: false },
+      beginner:     { stars: 0, baselineDone: false, completed: false },
+      intermediate: { stars: 0, baselineDone: false, completed: false },
+      advanced:     { stars: 0, baselineDone: false, completed: false },
     },
   };
 }
@@ -38,11 +41,11 @@ function loadState() {
     const p = JSON.parse(raw);
     if (p.v !== 2) return migrateOldState();
     const s = defaultState();
-    s.level = (p.level === "intermediate") ? "intermediate" : "beginner";
+    s.level = LEVEL_ORDER.includes(p.level) ? p.level : "beginner";
     if (p.levelData) {
-      ["beginner", "intermediate"].forEach(lv => {
+      LEVEL_ORDER.forEach(lv => {
         if (p.levelData[lv]) {
-          s.levelData[lv].stars       = Math.min(3, Math.max(0, Number(p.levelData[lv].stars) || 0));
+          s.levelData[lv].stars        = Math.min(3, Math.max(0, Number(p.levelData[lv].stars) || 0));
           s.levelData[lv].baselineDone = Boolean(p.levelData[lv].baselineDone);
           s.levelData[lv].completed    = Boolean(p.levelData[lv].completed);
         }
@@ -60,7 +63,7 @@ function migrateOldState() {
     const p = JSON.parse(raw);
     const s = defaultState();
     if (p.level === "graduate") {
-      s.level = "intermediate";
+      s.level = "advanced";
       s.levelData.beginner     = { stars: 3, baselineDone: true, completed: true };
       s.levelData.intermediate = { stars: 3, baselineDone: true, completed: true };
     } else if (p.level === "intermediate") {
@@ -81,7 +84,13 @@ function saveState() {
 
 // ── Helpers for current level ──
 function cur() { return state.levelData[state.level]; }
-function intermediateUnlocked() { return state.levelData.beginner.completed || state.levelData.intermediate.stars > 0 || state.levelData.intermediate.baselineDone; }
+function nextLevel(lv) { return LEVEL_ORDER[LEVEL_ORDER.indexOf(lv) + 1] || null; }
+function isUnlocked(lv) {
+  const idx = LEVEL_ORDER.indexOf(lv);
+  if (idx === 0) return true;
+  const prev = LEVEL_ORDER[idx - 1];
+  return state.levelData[prev].completed || state.levelData[lv].stars > 0 || state.levelData[lv].baselineDone;
+}
 
 function tierForPercent(p) {
   if (p < 50) return "foundation";
@@ -130,12 +139,13 @@ function renderStarsRow() {
 function renderLevelTabs() {
   const tabs = document.getElementById("level-tabs");
   if (!tabs) return;
-  const levels = ["beginner", "intermediate"];
-  tabs.innerHTML = levels.map(lv => {
-    const unlocked = lv === "beginner" || intermediateUnlocked();
-    const active = lv === state.level;
-    const done = state.levelData[lv].completed;
-    return `<button class="level-tab${active ? " active" : ""}${!unlocked ? " locked" : ""}" data-level="${lv}" ${!unlocked ? "disabled title='Complete Beginner first'" : ""}>
+  tabs.innerHTML = LEVEL_ORDER.map(lv => {
+    const unlocked = isUnlocked(lv);
+    const active   = lv === state.level;
+    const done     = state.levelData[lv].completed;
+    const prev     = LEVEL_ORDER[LEVEL_ORDER.indexOf(lv) - 1];
+    const hint     = prev ? `Complete ${LEVEL_LABELS[prev]} first` : "";
+    return `<button class="level-tab${active ? " active" : ""}${!unlocked ? " locked" : ""}" data-level="${lv}" ${!unlocked ? `disabled title="${hint}"` : ""}>
       ${LEVEL_LABELS[lv]}${done ? " ✅" : ""}
     </button>`;
   }).join("");
@@ -166,9 +176,11 @@ function renderHome() {
   reset.hidden = !data.baselineDone && data.stars === 0 && state.level === "beginner";
 
   if (data.completed) {
-    const otherLevel = state.level === "beginner" ? "intermediate" : null;
-    status.textContent = `You've completed the ${LEVEL_LABELS[state.level]} path with 3 stars! ${otherLevel ? "Switch to Intermediate above to keep going." : "You've finished the whole course — amazing work! 🎉"}`;
-    primary.textContent = "Review opening quiz";
+    const next = nextLevel(state.level);
+    status.textContent = next
+      ? `You've completed ${LEVEL_LABELS[state.level]} with 3 stars! Switch to ${LEVEL_LABELS[next]} above to keep going.`
+      : "You've completed ALL levels — you're an AI literacy expert! 🎉";
+    primary.textContent = next ? `Start ${LEVEL_LABELS[next]} →` : "Review opening quiz";
     primary.hidden = false;
     reset.hidden = false;
     return;
@@ -200,7 +212,7 @@ function renderHome() {
 }
 
 function getModuleTracks() {
-  return state.level === "intermediate" ? MODULES_BY_LEVEL.intermediate : MODULES_BY_LEVEL.beginner;
+  return MODULES_BY_LEVEL[state.level] || MODULES_BY_LEVEL.beginner;
 }
 
 function renderModuleSlide() {
@@ -350,9 +362,8 @@ function configureResultsActions() {
   const data = cur();
 
   if (data.completed) {
-    primary.textContent = state.level === "beginner" && intermediateUnlocked() && !state.levelData.intermediate.completed
-      ? "Go to Intermediate →"
-      : "Back to home";
+    const next = nextLevel(state.level);
+    primary.textContent = next ? `Go to ${LEVEL_LABELS[next]} →` : "Back to home";
     primary.hidden = false;
     return;
   }
@@ -397,8 +408,11 @@ function applyResultsCopy() {
   }
 
   let blurb = "";
+  const next = nextLevel(state.level);
   if (data.completed) {
-    blurb = `You've completed the ${LEVEL_LABELS[state.level]} path! All 3 stars earned.`;
+    blurb = next
+      ? `${LEVEL_LABELS[state.level]} complete! 3 stars earned — ${LEVEL_LABELS[next]} is now unlocked.`
+      : "You've completed ALL levels — AI literacy expert unlocked! 🏆";
   } else if (lastQuizKind === "baseline") {
     blurb = "Opening quiz done. Read anything you missed, then head into module track 1.";
   } else if (lastCheckpointPassed) {
@@ -414,7 +428,13 @@ function applyResultsCopy() {
 
 document.getElementById("btn-home-primary").addEventListener("click", () => {
   const data = cur();
-  if (data.completed) { startBaselineQuiz(); return; }
+  const next = nextLevel(state.level);
+  if (data.completed && next) {
+    state.level = next;
+    saveState();
+    renderHome();
+    return;
+  }
   if (!data.baselineDone) { startBaselineQuiz(); return; }
   if (data.stars < 3) { openModuleTrack(data.stars + 1); }
 });
@@ -483,41 +503,33 @@ document.getElementById("btn-results-primary").addEventListener("click", () => {
   document.getElementById("review-card").hidden = true;
   document.getElementById("star-award").hidden  = true;
   const data = cur();
+  const next = nextLevel(state.level);
 
-  if (data.completed) {
-    if (state.level === "beginner") {
-      // unlock and switch to intermediate
-      state.level = "intermediate";
+  const autoAdvance = () => {
+    if (next) {
+      state.level = next;
       saveState();
       showPanel("screen-levelup");
-      document.getElementById("levelup-body").textContent =
-        "You collected 3 golden stars on Beginner. Intermediate has new modules and trickier questions — same rhythm, harder habits.";
+      const levelNames = { intermediate: "Intermediate", advanced: "Advanced" };
+      const msgs = {
+        intermediate: "You earned 3 stars on Beginner! 🎉 Intermediate unlocks new modules and trickier questions — same rhythm, harder habits.",
+        advanced: "You earned 3 stars on Intermediate! 🎉 Advanced covers deepfakes, voice cloning, and provenance — the real expert stuff.",
+      };
+      document.getElementById("levelup-body").textContent = msgs[next] || `${levelNames[next]} is now unlocked!`;
       requestAnimationFrame(() => window.scrollTo(0, 0));
     } else {
       showPanel("screen-home");
       renderHome();
       requestAnimationFrame(() => window.scrollTo(0, 0));
     }
-    return;
-  }
+  };
 
+  if (data.completed) { autoAdvance(); return; }
   if (lastQuizKind === "baseline") { openModuleTrack(1); return; }
 
   if (lastQuizKind === "checkpoint" && lastCheckpointPassed) {
     if (data.stars < 3) { openModuleTrack(data.stars + 1); return; }
-    // stars just hit 3 — completed flag already set
-    if (state.level === "beginner") {
-      state.level = "intermediate";
-      saveState();
-      showPanel("screen-levelup");
-      document.getElementById("levelup-body").textContent =
-        "You collected 3 golden stars on Beginner! Intermediate is now unlocked — same rhythm, harder questions.";
-      requestAnimationFrame(() => window.scrollTo(0, 0));
-    } else {
-      showPanel("screen-home");
-      renderHome();
-      requestAnimationFrame(() => window.scrollTo(0, 0));
-    }
+    autoAdvance();
     return;
   }
 
