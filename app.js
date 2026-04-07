@@ -510,12 +510,12 @@ document.getElementById("btn-results-primary").addEventListener("click", () => {
       state.level = next;
       saveState();
       showPanel("screen-levelup");
-      const levelNames = { intermediate: "Intermediate", advanced: "Advanced" };
       const msgs = {
         intermediate: "You earned 3 stars on Beginner! 🎉 Intermediate unlocks new modules and trickier questions — same rhythm, harder habits.",
         advanced: "You earned 3 stars on Intermediate! 🎉 Advanced covers deepfakes, voice cloning, and provenance — the real expert stuff.",
       };
-      document.getElementById("levelup-body").textContent = msgs[next] || `${levelNames[next]} is now unlocked!`;
+      document.getElementById("levelup-body").textContent = msgs[next] || `${LEVEL_LABELS[next]} is now unlocked!`;
+      document.getElementById("btn-levelup-ok").textContent = `Start ${LEVEL_LABELS[next]} →`;
       requestAnimationFrame(() => window.scrollTo(0, 0));
     } else {
       showPanel("screen-home");
