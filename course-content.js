@@ -272,6 +272,171 @@ const IMG_SYN_OFFICE = svgDataUrl(`
   <rect width="480" height="320" filter="url(#ograin)"/>
 </svg>`);
 
+/* ── Extra beginner synthetic images (distinct from INDOOR/STREET/FLORA/AI_HARD) ── */
+
+const IMG_SYN_BEACH = svgDataUrl(`
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 320">
+  <defs>
+    <linearGradient id="bsky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4ab0e8"/><stop offset="0.5" stop-color="#87ceeb"/><stop offset="1" stop-color="#c8e8f8"/>
+    </linearGradient>
+    <linearGradient id="bsea" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1a7ab0"/><stop offset="0.5" stop-color="#2898c8"/><stop offset="1" stop-color="#50b8d8"/>
+    </linearGradient>
+    <linearGradient id="bsand" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e8d898"/><stop offset="1" stop-color="#c8b870"/>
+    </linearGradient>
+    <filter id="bgrain">
+      <feTurbulence type="fractalNoise" baseFrequency="0.62" numOctaves="3" seed="7" result="n"/>
+      <feColorMatrix in="n" type="saturate" values="0"/><feComponentTransfer><feFuncA type="linear" slope="0.12"/></feComponentTransfer>
+    </filter>
+  </defs>
+  <rect width="480" height="320" fill="url(#bsky)"/>
+  <ellipse cx="380" cy="62" rx="42" ry="42" fill="#fff8e0" opacity="0.95"/>
+  <ellipse cx="380" cy="62" rx="56" ry="56" fill="#ffe060" opacity="0.18"/>
+  <rect x="0" y="148" width="480" height="108" fill="url(#bsea)"/>
+  <path d="M0 148 Q 60 138 120 148 Q 180 158 240 148 Q 300 138 360 148 Q 420 158 480 148 L480 160 Q 420 170 360 160 Q 300 150 240 160 Q 180 170 120 160 Q 60 150 0 160 Z" fill="#5cc0e0" opacity="0.7"/>
+  <path d="M0 175 Q 80 165 160 175 Q 240 185 320 175 Q 400 165 480 175 L480 185 Q 400 175 320 185 Q 240 195 160 185 Q 80 175 0 185 Z" fill="#70c8e8" opacity="0.5"/>
+  <rect x="0" y="254" width="480" height="66" fill="url(#bsand)"/>
+  <ellipse cx="240" cy="258" rx="220" ry="10" fill="#d8c878" opacity="0.5"/>
+  <rect width="480" height="320" filter="url(#bgrain)"/>
+</svg>`);
+
+const IMG_SYN_BEDROOM = svgDataUrl(`
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 320">
+  <defs>
+    <linearGradient id="brwall" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f0ece8"/><stop offset="1" stop-color="#ddd8d0"/>
+    </linearGradient>
+    <linearGradient id="brbed" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e8e0d8"/><stop offset="1" stop-color="#c8c0b8"/>
+    </linearGradient>
+    <linearGradient id="brfloor" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#b8a888"/><stop offset="0.5" stop-color="#d0c0a0"/><stop offset="1" stop-color="#b8a888"/>
+    </linearGradient>
+    <filter id="brgrain">
+      <feTurbulence type="fractalNoise" baseFrequency="0.66" numOctaves="3" seed="23" result="n"/>
+      <feColorMatrix in="n" type="saturate" values="0"/><feComponentTransfer><feFuncA type="linear" slope="0.13"/></feComponentTransfer>
+    </filter>
+  </defs>
+  <rect width="480" height="320" fill="url(#brwall)"/>
+  <rect x="0" y="232" width="480" height="88" fill="url(#brfloor)"/>
+  <rect x="100" y="182" width="280" height="58" rx="3" fill="#d8d0c8"/>
+  <rect x="96" y="138" width="288" height="52" rx="4" fill="#c0b8b0"/>
+  <rect x="116" y="148" width="248" height="36" rx="2" fill="url(#brbed)"/>
+  <rect x="116" y="148" width="112" height="36" rx="2" fill="#e8e4e0" opacity="0.7"/>
+  <rect x="252" y="148" width="112" height="36" rx="2" fill="#e8e4e0" opacity="0.7"/>
+  <rect x="72" y="148" width="48" height="88" rx="3" fill="#c8c0b8"/>
+  <rect x="78" y="154" width="36" height="52" rx="2" fill="#b8b0a8"/>
+  <ellipse cx="96" cy="160" rx="12" ry="16" fill="#e8d8a0" opacity="0.9"/>
+  <rect x="360" y="148" width="48" height="88" rx="3" fill="#c8c0b8"/>
+  <rect x="366" y="154" width="36" height="52" rx="2" fill="#b8b0a8"/>
+  <ellipse cx="384" cy="160" rx="12" ry="16" fill="#e8d8a0" opacity="0.9"/>
+  <rect x="160" y="28" width="160" height="108" rx="2" fill="#d0e0ec" stroke="#b0c0cc" stroke-width="1.5"/>
+  <rect x="168" y="36" width="144" height="92" fill="#e8f0f8" opacity="0.7"/>
+  <rect width="480" height="320" filter="url(#brgrain)"/>
+</svg>`);
+
+const IMG_SYN_HALLWAY = svgDataUrl(`
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 320">
+  <defs>
+    <linearGradient id="hwall" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e4e0da"/><stop offset="1" stop-color="#c8c4bc"/>
+    </linearGradient>
+    <linearGradient id="hfloor" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#a89880"/><stop offset="1" stop-color="#786858"/>
+    </linearGradient>
+    <filter id="hgrain">
+      <feTurbulence type="fractalNoise" baseFrequency="0.68" numOctaves="3" seed="61" result="n"/>
+      <feColorMatrix in="n" type="saturate" values="0"/><feComponentTransfer><feFuncA type="linear" slope="0.14"/></feComponentTransfer>
+    </filter>
+  </defs>
+  <rect width="480" height="320" fill="url(#hwall)"/>
+  <polygon points="0,0 480,0 340,200 140,200" fill="#d8d4cc" opacity="0.5"/>
+  <rect x="0" y="200" width="480" height="120" fill="url(#hfloor)"/>
+  <polygon points="0,200 140,200 240,160 0,110" fill="#d0ccc4"/>
+  <polygon points="480,200 340,200 240,160 480,110" fill="#ccc8c0"/>
+  <rect x="20" y="38" width="80" height="150" rx="2" fill="#c0bcb4" stroke="#a8a49c" stroke-width="1.5"/>
+  <rect x="26" y="44" width="68" height="138" rx="1" fill="#b8b4ac"/>
+  <circle cx="98" cy="118" r="5" fill="#888480"/>
+  <rect x="380" y="38" width="80" height="150" rx="2" fill="#c0bcb4" stroke="#a8a49c" stroke-width="1.5"/>
+  <rect x="386" y="44" width="68" height="138" rx="1" fill="#b8b4ac"/>
+  <circle cx="382" cy="118" r="5" fill="#888480"/>
+  <rect x="130" y="68" width="60" height="118" rx="2" fill="#c8c4bc" stroke="#a8a49c" stroke-width="1"/>
+  <rect x="290" y="68" width="60" height="118" rx="2" fill="#c8c4bc" stroke="#a8a49c" stroke-width="1"/>
+  <ellipse cx="240" cy="162" rx="48" ry="28" fill="#f0ece4" opacity="0.8"/>
+  <rect width="480" height="320" filter="url(#hgrain)"/>
+</svg>`);
+
+/* ── Advanced-only synthetic images ── */
+
+const IMG_SYN_STADIUM = svgDataUrl(`
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 320">
+  <defs>
+    <linearGradient id="stsky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0a1628"/><stop offset="0.6" stop-color="#1a3060"/><stop offset="1" stop-color="#2850a0"/>
+    </linearGradient>
+    <linearGradient id="stfield" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2d7a30"/><stop offset="1" stop-color="#1a5020"/>
+    </linearGradient>
+    <filter id="stgrain">
+      <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" seed="88" result="n"/>
+      <feColorMatrix in="n" type="saturate" values="0"/><feComponentTransfer><feFuncA type="linear" slope="0.15"/></feComponentTransfer>
+    </filter>
+    <filter id="stglow3"><feGaussianBlur stdDeviation="5"/></filter>
+  </defs>
+  <rect width="480" height="320" fill="url(#stsky)"/>
+  <ellipse cx="240" cy="200" rx="220" ry="88" fill="url(#stfield)"/>
+  <ellipse cx="240" cy="200" rx="200" ry="72" fill="#3a8840" opacity="0.5"/>
+  <ellipse cx="240" cy="200" rx="150" ry="52" fill="#2e7032" opacity="0.4"/>
+  <path d="M 40 132 Q 240 88 440 132 L 440 148 Q 240 104 40 148 Z" fill="#c8c0b8" opacity="0.9"/>
+  <path d="M 20 148 Q 240 100 460 148 L 460 168 Q 240 120 20 168 Z" fill="#b8b0a8" opacity="0.85"/>
+  <path d="M 8 168 Q 240 114 472 168 L 472 190 Q 240 134 8 190 Z" fill="#a8a098" opacity="0.8"/>
+  <path d="M 0 190 Q 240 130 480 190 L 480 215 Q 240 155 0 215 Z" fill="#989088" opacity="0.75"/>
+  <ellipse cx="240" cy="200" rx="100" ry="36" fill="#fff" opacity="0.06"/>
+  <ellipse cx="240" cy="180" rx="80" ry="10" fill="#fff8c0" opacity="0.12" filter="url(#stglow3)"/>
+  <rect x="224" y="190" width="32" height="20" fill="#fff" opacity="0.12"/>
+  <rect width="480" height="320" filter="url(#stgrain)"/>
+</svg>`);
+
+const IMG_SYN_NEWSROOM = svgDataUrl(`
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 320">
+  <defs>
+    <linearGradient id="nrbg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1a1e28"/><stop offset="1" stop-color="#0e1018"/>
+    </linearGradient>
+    <linearGradient id="nrscreen" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0a2048"/><stop offset="1" stop-color="#061030"/>
+    </linearGradient>
+    <filter id="nrgrain">
+      <feTurbulence type="fractalNoise" baseFrequency="0.7" numOctaves="3" seed="33" result="n"/>
+      <feColorMatrix in="n" type="saturate" values="0"/><feComponentTransfer><feFuncA type="linear" slope="0.13"/></feComponentTransfer>
+    </filter>
+    <filter id="nrglow4"><feGaussianBlur stdDeviation="6"/></filter>
+  </defs>
+  <rect width="480" height="320" fill="url(#nrbg)"/>
+  <rect x="20" y="14" width="440" height="120" rx="2" fill="#0a1a38" stroke="#1a3060" stroke-width="1"/>
+  <rect x="24" y="18" width="432" height="112" fill="url(#nrscreen)"/>
+  <rect x="34" y="28" width="180" height="92" rx="1" fill="#1a4080" opacity="0.7"/>
+  <rect x="42" y="36" width="164" height="14" rx="1" fill="#2060c0" opacity="0.6"/>
+  <rect x="42" y="56" width="120" height="8" rx="1" fill="#4080e0" opacity="0.4"/>
+  <rect x="42" y="68" width="140" height="8" rx="1" fill="#4080e0" opacity="0.35"/>
+  <rect x="42" y="80" width="100" height="8" rx="1" fill="#4080e0" opacity="0.3"/>
+  <rect x="224" y="28" width="220" height="92" rx="1" fill="#1e1020" opacity="0.8"/>
+  <ellipse cx="334" cy="74" rx="60" ry="38" fill="#3a1a10" opacity="0.7"/>
+  <ellipse cx="334" cy="60" rx="28" ry="34" fill="#c09080" opacity="0.5"/>
+  <rect x="30" y="148" width="420" height="18" fill="#c8a840" opacity="0.85"/>
+  <rect x="34" y="151" width="280" height="12" rx="1" fill="#201000" opacity="0.6"/>
+  <rect x="20" y="178" width="132" height="90" rx="2" fill="#0d1828" stroke="#1a2a48" stroke-width="1"/>
+  <rect x="24" y="182" width="124" height="82" fill="url(#nrscreen)" opacity="0.9"/>
+  <rect x="168" y="178" width="132" height="90" rx="2" fill="#0d1828" stroke="#1a2a48" stroke-width="1"/>
+  <rect x="172" y="182" width="124" height="82" fill="url(#nrscreen)" opacity="0.9"/>
+  <rect x="316" y="178" width="144" height="90" rx="2" fill="#0d1828" stroke="#1a2a48" stroke-width="1"/>
+  <rect x="320" y="182" width="136" height="82" fill="url(#nrscreen)" opacity="0.9"/>
+  <ellipse cx="240" cy="170" rx="200" ry="22" fill="#3060c0" opacity="0.06" filter="url(#nrglow4)"/>
+  <rect width="480" height="320" filter="url(#nrgrain)"/>
+</svg>`);
+
 const PHOTO = (seed) => `https://picsum.photos/seed/${seed}/480/320`;
 
 const CHECKPOINT_TITLES = {
@@ -532,10 +697,10 @@ const QUIZ_CP_BEGINNER_1 = withIds("bb1", [
   },
   {
     kind: "image",
-    imageSrc: IMG_SYN_FLORA,
-    imageAlt: "Blurry garden scene",
+    imageSrc: IMG_SYN_BEACH,
+    imageAlt: "Calm beach and ocean scene",
     answer: "ai",
-    explanation: "Looks like a bokeh plant photo, but the shapes are too regular and the blur field is perfectly even. Real plant photos have messy, random edges.",
+    explanation: "Looks like a vacation photo — but the waves are perfectly identical sine curves, the sky gradient is mathematically smooth, and the sun is a flawless circle. Real beaches are never that tidy.",
   },
   {
     kind: "text",
@@ -582,10 +747,10 @@ const QUIZ_CP_BEGINNER_2 = withIds("bb2", [
   },
   {
     kind: "image",
-    imageSrc: IMG_SYN_INDOOR,
-    imageAlt: "Room with a bright window glow",
+    imageSrc: IMG_SYN_BEDROOM,
+    imageAlt: "Neat bedroom with matching nightstands",
     answer: "ai",
-    explanation: "The window is a perfect glowing rectangle. No reflections, no smudges, no curtain. Real windows are never that flawless.",
+    explanation: "The two nightstands are pixel-perfect clones, the bed is centered like a blueprint, and every surface is spotless. Real bedrooms always have something off — a crooked pillow, a phone charger, a book.",
   },
   {
     kind: "text",
@@ -602,10 +767,10 @@ const QUIZ_CP_BEGINNER_2 = withIds("bb2", [
   },
   {
     kind: "image",
-    imageSrc: IMG_AI_HARD,
-    imageAlt: "Moody sunset silhouette",
+    imageSrc: IMG_SYN_HALLWAY,
+    imageAlt: "Long corridor with identical doors",
     answer: "ai",
-    explanation: "Looks like a phone photo but it's made with code. Lesson: when something looks almost too cinematic, ask where it came from before sharing it.",
+    explanation: "The doors on both sides are mathematically identical, the perspective lines are perfectly centered, and the floor has no scuffs or marks. Real hallways always have something imperfect.",
   },
   {
     kind: "text",
@@ -622,10 +787,10 @@ const QUIZ_CP_BEGINNER_2 = withIds("bb2", [
   },
   {
     kind: "image",
-    imageSrc: IMG_SYN_FLORA,
-    imageAlt: "Out-of-focus plants and stems",
-    answer: "ai",
-    explanation: "This one tries to look like a blurry close-up of plants. But the stems are too parallel and the blur is too uniform. Compare it to the real forest photo above.",
+    imageSrc: PHOTO("realriver55"),
+    imageAlt: "River flowing over rocks",
+    answer: "human",
+    explanation: "Real photo — the water flow, foam patterns, and random rock shapes are exactly the kind of chaotic natural detail that cameras capture and generators still struggle to fake convincingly.",
   },
 ]);
 
@@ -651,8 +816,8 @@ const QUIZ_CP_BEGINNER_3 = withIds("bb3", [
   },
   {
     kind: "image",
-    imageSrc: PHOTO("realbench24"),
-    imageAlt: "Park bench scene",
+    imageSrc: PHOTO("realpath22"),
+    imageAlt: "Path through a park",
     answer: "human",
     explanation: "Practice the habit: ask where this was posted before trusting it. In this case it's a real photo from a known source — but the habit of checking is what matters.",
   },
@@ -1063,10 +1228,10 @@ const QUIZ_CP_ADVANCED_2 = withIds("ab2", [
   },
   {
     kind: "image",
-    imageSrc: IMG_AI_HARD,
-    imageAlt: "Dramatic landscape",
+    imageSrc: IMG_SYN_STADIUM,
+    imageAlt: "Empty sports stadium at night",
     answer: "ai",
-    explanation: "Provenance check: can you find a photographer credit, camera model, or publication for this image? No? Then treat it as unverified regardless of how it looks.",
+    explanation: "Provenance check: no photographer, no venue name, no camera metadata. The stadium itself also shows AI tells — perfectly symmetrical seating tiers, no signage, no real-world imperfections.",
   },
   {
     kind: "text",
@@ -1137,10 +1302,10 @@ const QUIZ_CP_ADVANCED_3 = withIds("ab3", [
   },
   {
     kind: "image",
-    imageSrc: IMG_SYN_PORTRAIT,
-    imageAlt: "Polished portrait photo",
+    imageSrc: IMG_SYN_NEWSROOM,
+    imageAlt: "Professional TV newsroom set",
     answer: "ai",
-    explanation: "AI-generated faces still appear in fake news articles, social media profiles, and product reviews. The stakes of not checking: you might trust someone who doesn't exist.",
+    explanation: "AI-generated newsroom images appear in fake media sites to add credibility. The backdrop screens show no real content, the desk layout is too symmetrical, and there are zero people — a real newsroom never looks like this.",
   },
   {
     kind: "text",
