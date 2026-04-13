@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Kalnia:wght@400;500;600;700&family=Limelight&display=swap');
+@import url('https://api.fontshare.com/v2/css?f[]=recoleta@400,500,700&display=swap');
 
 :root {
   --bg: #fdf4e7;
@@ -15,8 +15,8 @@
   --human: #5a8a3c;
   --ai: #9b6b4e;
   --radius: 16px;
-  --font-sans: "Kalnia", Georgia, serif;
-  --font-display: "Limelight", cursive;
+  --font-sans: "Recoleta", Georgia, serif;
+  --font-display: "Recoleta", Georgia, serif;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
