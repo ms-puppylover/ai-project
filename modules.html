@@ -4,8 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Real or AI? — Learning Modules</title>
-  <link rel="preconnect" href="https://api.fontshare.com" />
-  <link href="https://api.fontshare.com/v2/css?f[]=recoleta@400,500,700&display=swap" rel="stylesheet" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Kalnia:wght@400;500;600;700&family=Limelight&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -14,16 +15,22 @@
     <header class="hero">
       <p class="eyebrow">AI Literacy · Learning Modules</p>
       <h1>Real or <em>AI?</em></h1>
-      <p class="lede">Three skill tracks — words, images, and habits. Read each card, then prove you got it with a checkpoint quiz.</p>
+      <p class="lede">Three skill tracks per level — words, images, and habits. Read each card, then prove you got it with a checkpoint quiz.</p>
     </header>
 
-    <!-- Track picker -->
+    <!-- Home: level + track picker -->
     <section id="screen-home" class="panel active" aria-labelledby="home-heading">
-      <h2 id="home-heading" class="sr-only">Choose a track</h2>
-      <div class="level-tabs" id="track-tabs"></div>
+      <h2 id="home-heading" class="sr-only">Choose a level and track</h2>
+
+      <!-- Level tabs -->
+      <div class="level-tabs" id="level-tabs"></div>
+
+      <!-- Track tabs -->
+      <div class="level-tabs" id="track-tabs" style="margin-top:0.5rem"></div>
+
       <p class="home-status" id="track-status"></p>
       <div class="home-actions">
-        <button type="button" class="btn primary" id="btn-start-track">Start Module Track 1 →</button>
+        <button type="button" class="btn primary" id="btn-start-track">Start Track 1 →</button>
       </div>
     </section>
 
@@ -79,12 +86,21 @@
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
   <script src="course-content.js"></script>
   <script>
-    const TRACK_TITLES = ["Words: spot the filler", "Images: real or computer-made?", "Habits: trust but verify"];
+    const LEVELS = ["beginner", "intermediate", "advanced"];
+    const LEVEL_LABELS = { beginner: "Beginner", intermediate: "Intermediate", advanced: "Advanced" };
+    const TRACK_TITLES = {
+      beginner:     ["Words: spot the filler", "Images: real or computer-made?", "Habits: trust but verify"],
+      intermediate: ["Genre: who actually wrote this?", "Images + captions: do they match?", "Stay humble, stay safe"],
+      advanced:     ["Deepfakes & synthetic faces", "Provenance & verification", "AI in the wild"],
+    };
+
+    let activeLevel = "beginner";
     let activeTrack = 1;
     let slideIndex  = 0;
     let activeQuizItems = [];
     let lastPassed = false;
-    let stars = [false, false, false]; // star per track
+    // stars[level][track-1]
+    const stars = { beginner: [false,false,false], intermediate: [false,false,false], advanced: [false,false,false] };
 
     function escapeHtml(t) {
       const d = document.createElement("div"); d.textContent = t; return d.innerHTML;
@@ -101,37 +117,53 @@
       });
     }
 
-    // ── Track picker ──
-    function renderTrackPicker() {
-      const tabs = document.getElementById("track-tabs");
-      tabs.innerHTML = [1, 2, 3].map(n => {
-        const done = stars[n - 1];
-        const active = n === activeTrack;
-        return `<button class="level-tab${active ? " active" : ""}" data-track="${n}">
+    // ── Pickers ──
+    function renderPickers() {
+      // Level tabs
+      const levelTabs = document.getElementById("level-tabs");
+      levelTabs.innerHTML = LEVELS.map(lv => `
+        <button class="level-tab${lv === activeLevel ? " active" : ""}" data-level="${lv}">
+          ${LEVEL_LABELS[lv]}
+        </button>`).join("");
+      levelTabs.querySelectorAll(".level-tab").forEach(btn => {
+        btn.addEventListener("click", () => {
+          activeLevel = btn.dataset.level;
+          activeTrack = 1;
+          renderPickers();
+        });
+      });
+
+      // Track tabs
+      const trackTabs = document.getElementById("track-tabs");
+      trackTabs.innerHTML = [1,2,3].map(n => {
+        const done = stars[activeLevel][n - 1];
+        return `<button class="level-tab${n === activeTrack ? " active" : ""}" data-track="${n}">
           Track ${n}${done ? " ★" : ""}
         </button>`;
       }).join("");
-      tabs.querySelectorAll(".level-tab").forEach(btn => {
+      trackTabs.querySelectorAll(".level-tab").forEach(btn => {
         btn.addEventListener("click", () => {
           activeTrack = Number(btn.dataset.track);
-          renderTrackPicker();
-          document.getElementById("btn-start-track").textContent = `Start Module Track ${activeTrack} →`;
-          document.getElementById("track-status").textContent = TRACK_TITLES[activeTrack - 1];
+          renderPickers();
         });
       });
-      document.getElementById("track-status").textContent = TRACK_TITLES[activeTrack - 1];
-      document.getElementById("btn-start-track").textContent = `Start Module Track ${activeTrack} →`;
+
+      const titles = TRACK_TITLES[activeLevel] || TRACK_TITLES.beginner;
+      document.getElementById("track-status").textContent = titles[activeTrack - 1];
+      document.getElementById("btn-start-track").textContent =
+        `Start ${LEVEL_LABELS[activeLevel]} · Track ${activeTrack} →`;
     }
 
-    document.getElementById("btn-start-track").addEventListener("click", () => openTrack(activeTrack));
+    document.getElementById("btn-start-track").addEventListener("click", () => openTrack(activeLevel, activeTrack));
     document.getElementById("btn-back-home").addEventListener("click", () => {
       showPanel("screen-home");
-      renderTrackPicker();
+      renderPickers();
       requestAnimationFrame(() => window.scrollTo(0, 0));
     });
 
     // ── Module slides ──
-    function openTrack(track) {
+    function openTrack(level, track) {
+      activeLevel = level;
       activeTrack = track;
       slideIndex  = 0;
       renderSlide();
@@ -140,11 +172,11 @@
     }
 
     function renderSlide() {
-      const slides = (MODULES_BY_LEVEL.beginner || [])[activeTrack - 1] || [];
+      const slides = (MODULES_BY_LEVEL[activeLevel] || MODULES_BY_LEVEL.beginner)[activeTrack - 1] || [];
       const slide  = slides[slideIndex];
       if (!slide) return;
       document.getElementById("module-meta").textContent =
-        `Beginner · Track ${activeTrack} of 3 · Card ${slideIndex + 1} of ${slides.length}`;
+        `${LEVEL_LABELS[activeLevel]} · Track ${activeTrack} of 3 · Card ${slideIndex + 1} of ${slides.length}`;
       document.getElementById("modules-heading").textContent = slide.title;
       document.getElementById("module-body").innerHTML = slide.html;
       document.getElementById("module-slide-count").textContent = `Page ${slideIndex + 1} of ${slides.length}`;
@@ -153,7 +185,7 @@
     }
 
     document.getElementById("btn-module-next").addEventListener("click", () => {
-      const slides = (MODULES_BY_LEVEL.beginner || [])[activeTrack - 1] || [];
+      const slides = (MODULES_BY_LEVEL[activeLevel] || MODULES_BY_LEVEL.beginner)[activeTrack - 1] || [];
       if (slideIndex < slides.length - 1) {
         slideIndex++;
         renderSlide();
@@ -165,10 +197,11 @@
 
     // ── Checkpoint quiz ──
     function startCheckpoint() {
-      activeQuizItems = CHECKPOINT_QUIZZES.beginner[activeTrack - 1] || [];
+      activeQuizItems = (CHECKPOINT_QUIZZES[activeLevel] || CHECKPOINT_QUIZZES.beginner)[activeTrack - 1] || [];
       const need = starThresholdForQuiz(activeQuizItems);
+      const titles = TRACK_TITLES[activeLevel] || TRACK_TITLES.beginner;
       document.getElementById("quiz-context").textContent =
-        `Track ${activeTrack} checkpoint · ${TRACK_TITLES[activeTrack - 1]} · need ${need} / ${activeQuizItems.length} for a ★`;
+        `${LEVEL_LABELS[activeLevel]} · Track ${activeTrack} · ${titles[activeTrack - 1]} · need ${need} / ${activeQuizItems.length} for a ★`;
       renderQuiz();
       showPanel("screen-quiz");
       requestAnimationFrame(() => window.scrollTo(0, 0));
@@ -177,6 +210,7 @@
     function renderQuiz() {
       const container = document.getElementById("quiz-items");
       container.innerHTML = "";
+      document.getElementById("quiz-form").reset();
       activeQuizItems.forEach((item, i) => {
         const labels = choiceLabels(item.kind);
         const article = document.createElement("article");
@@ -217,8 +251,7 @@
       const pct  = Math.round((correct / activeQuizItems.length) * 100);
       const need = starThresholdForQuiz(activeQuizItems);
       lastPassed = correct >= need;
-
-      if (lastPassed) stars[activeTrack - 1] = true;
+      if (lastPassed) stars[activeLevel][activeTrack - 1] = true;
 
       if (pct === 100) {
         setTimeout(() => {
@@ -228,10 +261,10 @@
         }, 400);
       }
 
-      // Star award
       const starAward = document.getElementById("star-award");
       starAward.hidden = !lastPassed;
-      if (lastPassed) document.getElementById("star-award-text").textContent = `★ Star earned for Track ${activeTrack}!`;
+      if (lastPassed) document.getElementById("star-award-text").textContent =
+        `★ Star earned — ${LEVEL_LABELS[activeLevel]} Track ${activeTrack}!`;
 
       document.getElementById("score-line").textContent = `${correct} / ${activeQuizItems.length} correct (${pct}%)`;
       const tierLabels = { foundation: "Growing observer", intermediate: "Solid instincts", expert: "Sharp eye — stay humble" };
@@ -241,7 +274,6 @@
         ? `Checkpoint passed! (${need}+ / ${activeQuizItems.length} required.)`
         : `Need ${need}+ correct for a star. Revisit the module, then retry.`;
 
-      // Wrong review
       const wrong = details.filter(d => !d.ok);
       const card  = document.getElementById("review-card");
       card.hidden = false;
@@ -261,13 +293,13 @@
         </article>`;
       }).join("");
 
-      // Next button
       const nextBtn  = document.getElementById("btn-results-next");
       const retryBtn = document.getElementById("btn-results-retry");
+      retryBtn.hidden = true;
       if (lastPassed && activeTrack < 3) {
         nextBtn.textContent = `Continue to Track ${activeTrack + 1} →`;
-      } else if (lastPassed && activeTrack === 3) {
-        nextBtn.textContent = "All done! Back to tracks";
+      } else if (lastPassed) {
+        nextBtn.textContent = "Back to tracks";
       } else {
         nextBtn.textContent = "Review module again";
         retryBtn.hidden = false;
@@ -280,12 +312,11 @@
     document.getElementById("btn-results-next").addEventListener("click", () => {
       document.getElementById("review-card").hidden = true;
       document.getElementById("star-award").hidden  = true;
-      document.getElementById("btn-results-retry").hidden = true;
       if (lastPassed && activeTrack < 3) {
-        openTrack(activeTrack + 1);
+        openTrack(activeLevel, activeTrack + 1);
       } else {
         showPanel("screen-home");
-        renderTrackPicker();
+        renderPickers();
       }
       requestAnimationFrame(() => window.scrollTo(0, 0));
     });
@@ -293,12 +324,10 @@
     document.getElementById("btn-results-retry").addEventListener("click", () => {
       document.getElementById("review-card").hidden = true;
       document.getElementById("star-award").hidden  = true;
-      document.getElementById("btn-results-retry").hidden = true;
-      document.getElementById("quiz-form").reset();
       startCheckpoint();
     });
 
-    renderTrackPicker();
+    renderPickers();
   </script>
 </body>
 </html>
