@@ -21,13 +21,23 @@
     <section id="screen-home" class="panel active" aria-labelledby="home-heading">
       <h2 id="home-heading" class="sr-only">Choose a level and track</h2>
 
+      <!-- Progress strip -->
+      <div class="progress-strip">
+        <div class="progress-strip-inner">
+          <span class="level-pill" id="level-pill">Beginner</span>
+          <div class="stars-row" id="stars-row"></div>
+        </div>
+      </div>
+
       <!-- Level tabs -->
       <div class="level-tabs" id="level-tabs"></div>
 
-      <!-- Track tabs -->
-      <div class="level-tabs" id="track-tabs" style="margin-top:0.5rem"></div>
-
+      <!-- Status -->
       <p class="home-status" id="track-status"></p>
+
+      <!-- Track cards -->
+      <ul class="rules" id="track-cards"></ul>
+
       <div class="home-actions">
         <button type="button" class="btn primary" id="btn-start-track">Start Track 1 →</button>
       </div>
@@ -131,6 +141,17 @@
 
     // ── Pickers ──
     function renderPickers() {
+      // Progress strip
+      document.getElementById("level-pill").textContent = LEVEL_LABELS[activeLevel];
+      const starsRow = document.getElementById("stars-row");
+      starsRow.innerHTML = "";
+      for (let i = 0; i < 3; i++) {
+        const span = document.createElement("span");
+        span.className = "star-slot" + (stars[activeLevel][i] ? " filled" : "");
+        span.textContent = "★";
+        starsRow.appendChild(span);
+      }
+
       // Level tabs
       const levelTabs = document.getElementById("level-tabs");
       levelTabs.innerHTML = LEVELS.map(lv => {
@@ -150,28 +171,31 @@
         });
       });
 
-      // Track tabs
-      const trackTabs = document.getElementById("track-tabs");
-      trackTabs.innerHTML = [1,2,3].map(n => {
-        const unlocked = trackUnlocked(activeLevel, n);
-        const active   = n === activeTrack;
-        const done     = stars[activeLevel][n - 1];
-        return `<button class="level-tab${active ? " active" : ""}${!unlocked ? " locked" : ""}"
-          data-track="${n}" ${!unlocked ? 'disabled title="Complete the previous track first"' : ""}>
-          Track ${n}${done ? " ★" : ""}
-        </button>`;
-      }).join("");
-      trackTabs.querySelectorAll(".level-tab:not([disabled])").forEach(btn => {
-        btn.addEventListener("click", () => {
-          activeTrack = Number(btn.dataset.track);
-          renderPickers();
-        });
-      });
-
+      // Status text
+      const earned = stars[activeLevel].filter(s => s).length;
       const titles = TRACK_TITLES[activeLevel] || TRACK_TITLES.beginner;
-      document.getElementById("track-status").textContent = titles[activeTrack - 1];
+      const nextTrack = stars[activeLevel].findIndex(s => !s) + 1 || 3;
+      document.getElementById("track-status").textContent =
+        earned === 3
+          ? `You've completed all 3 tracks on ${LEVEL_LABELS[activeLevel]}! 🎉`
+          : `Read each module track, then pass the checkpoint quiz to earn a ★. You have ${earned} of 3 stars.`;
+
+      // Track cards
+      document.getElementById("track-cards").innerHTML = [1, 2, 3].map(n => {
+        const unlocked = trackUnlocked(activeLevel, n);
+        const done     = stars[activeLevel][n - 1];
+        return `<li style="display:flex;align-items:center;justify-content:space-between;gap:1rem;${!unlocked ? "opacity:0.45;" : ""}">
+          <span><strong>Track ${n} — ${titles[n - 1]}</strong></span>
+          <span style="font-size:1.2rem;flex-shrink:0;">${done ? "★" : unlocked ? "○" : "🔒"}</span>
+        </li>`;
+      }).join("");
+
+      // Active track = first incomplete unlocked
+      activeTrack = stars[activeLevel].findIndex(s => !s) + 1 || 3;
       document.getElementById("btn-start-track").textContent =
-        `Start ${LEVEL_LABELS[activeLevel]} · Track ${activeTrack} →`;
+        stars[activeLevel][activeTrack - 1]
+          ? `Review Track ${activeTrack} →`
+          : `Start Track ${activeTrack} →`;
     }
 
     document.getElementById("btn-start-track").addEventListener("click", () => openTrack(activeLevel, activeTrack));
