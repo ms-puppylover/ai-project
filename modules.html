@@ -116,15 +116,33 @@
       });
     }
 
+    // ── Unlock helpers ──
+    function levelUnlocked(lv) {
+      const idx = LEVELS.indexOf(lv);
+      if (idx === 0) return true;
+      const prev = LEVELS[idx - 1];
+      return stars[prev].every(s => s); // all 3 tracks of prev level done
+    }
+    function trackUnlocked(lv, track) {
+      if (!levelUnlocked(lv)) return false;
+      if (track === 1) return true;
+      return stars[lv][track - 2]; // previous track must have a star
+    }
+
     // ── Pickers ──
     function renderPickers() {
       // Level tabs
       const levelTabs = document.getElementById("level-tabs");
-      levelTabs.innerHTML = LEVELS.map(lv => `
-        <button class="level-tab${lv === activeLevel ? " active" : ""}" data-level="${lv}">
-          ${LEVEL_LABELS[lv]}
-        </button>`).join("");
-      levelTabs.querySelectorAll(".level-tab").forEach(btn => {
+      levelTabs.innerHTML = LEVELS.map(lv => {
+        const unlocked = levelUnlocked(lv);
+        const active   = lv === activeLevel;
+        const done     = stars[lv].every(s => s);
+        return `<button class="level-tab${active ? " active" : ""}${!unlocked ? " locked" : ""}"
+          data-level="${lv}" ${!unlocked ? 'disabled title="Complete the previous level first"' : ""}>
+          ${LEVEL_LABELS[lv]}${done ? " ✅" : ""}
+        </button>`;
+      }).join("");
+      levelTabs.querySelectorAll(".level-tab:not([disabled])").forEach(btn => {
         btn.addEventListener("click", () => {
           activeLevel = btn.dataset.level;
           activeTrack = 1;
@@ -135,12 +153,15 @@
       // Track tabs
       const trackTabs = document.getElementById("track-tabs");
       trackTabs.innerHTML = [1,2,3].map(n => {
-        const done = stars[activeLevel][n - 1];
-        return `<button class="level-tab${n === activeTrack ? " active" : ""}" data-track="${n}">
+        const unlocked = trackUnlocked(activeLevel, n);
+        const active   = n === activeTrack;
+        const done     = stars[activeLevel][n - 1];
+        return `<button class="level-tab${active ? " active" : ""}${!unlocked ? " locked" : ""}"
+          data-track="${n}" ${!unlocked ? 'disabled title="Complete the previous track first"' : ""}>
           Track ${n}${done ? " ★" : ""}
         </button>`;
       }).join("");
-      trackTabs.querySelectorAll(".level-tab").forEach(btn => {
+      trackTabs.querySelectorAll(".level-tab:not([disabled])").forEach(btn => {
         btn.addEventListener("click", () => {
           activeTrack = Number(btn.dataset.track);
           renderPickers();
