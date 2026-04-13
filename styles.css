@@ -295,14 +295,14 @@ h1 em {
 .star-slot { font-size: 1.5rem; line-height: 1; color: rgba(139,90,43,0.2); user-select: none; transition: color 0.3s; }
 .star-slot.filled { color: var(--warn); text-shadow: 0 0 16px rgba(245,158,11,0.45); }
 
-.level-tabs { display: flex; gap: 0.5rem; margin-bottom: 1.25rem; }
+.level-tabs { display: flex; gap: 0.5rem; margin-bottom: 1.25rem; justify-content: center; flex-wrap: wrap; }
 .level-tab { font-family: var(--font-sans); font-size: 0.88rem; font-weight: 700; padding: 0.45rem 1.1rem; border-radius: 999px; border: 2px solid var(--border-mid); background: var(--bg-elevated); color: var(--muted); cursor: pointer; transition: all 0.2s; }
 .level-tab:hover:not([disabled]) { border-color: var(--accent-border); color: var(--accent); }
 .level-tab.active { background: var(--accent); border-color: var(--accent); color: #fff; }
 .level-tab.locked { opacity: 0.4; cursor: not-allowed; }
 
-.home-status { margin: 0 0 1rem; color: var(--muted); font-size: 0.98rem; font-weight: 600; }
-.home-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; margin-top: 0.25rem; }
+.home-status { margin: 0 0 1rem; color: var(--muted); font-size: 0.98rem; font-weight: 600; text-align: center; }
+.home-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; justify-content: center; margin-top: 0.25rem; }
 
 .quiz-context { margin: 0 0 0.35rem; font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); font-weight: 800; }
 
