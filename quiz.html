@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Real or AI? — Opening Quiz</title>
+  <link rel="preconnect" href="https://api.fontshare.com" />
+  <link href="https://api.fontshare.com/v2/css?f[]=recoleta@400,500,700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="noise" aria-hidden="true"></div>
+  <main class="shell">
+    <header class="hero">
+      <p class="eyebrow">AI Literacy · Opening Quiz</p>
+      <h1>Real or <em>AI?</em></h1>
+      <p class="lede">Can you tell the difference between human-made and AI-generated content? Take the quiz and find out.</p>
+    </header>
+
+    <!-- Quiz screen -->
+    <section id="screen-quiz" class="panel active" aria-labelledby="quiz-heading">
+      <div class="quiz-top">
+        <p class="quiz-context" id="quiz-context">Opening quiz · 10 questions · mixed warm-up</p>
+        <h2 id="quiz-heading" class="sr-only">Quiz</h2>
+        <p class="progress" id="quiz-progress" aria-live="polite"></p>
+      </div>
+      <form id="quiz-form" novalidate>
+        <div id="quiz-items"></div>
+        <div class="form-actions">
+          <button type="submit" class="btn primary" id="btn-submit">Submit answers</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- Results screen -->
+    <section id="screen-results" class="panel" hidden aria-labelledby="results-heading">
+      <h2 id="results-heading">Your result</h2>
+      <p class="score-display" id="score-line" aria-live="polite"></p>
+      <p class="tier-label" id="tier-label"></p>
+      <p class="tier-blurb" id="tier-blurb"></p>
+      <div class="review-card" id="review-card" hidden aria-live="polite">
+        <h3>What you missed — and why</h3>
+        <p class="review-intro" id="review-intro"></p>
+        <div id="review-list"></div>
+      </div>
+      <div class="reading-card" id="reading-card">
+        <h3>Level up your skills</h3>
+        <div id="reading-body"></div>
+      </div>
+      <div class="results-actions">
+        <button type="button" class="btn primary" id="btn-retake">Retake quiz</button>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+  <script src="course-content.js"></script>
+  <script>
+    const items = QUIZ_BASELINE_BEGINNER;
+
+    function escapeHtml(t) {
+      const d = document.createElement("div"); d.textContent = t; return d.innerHTML;
+    }
+    function choiceLabels(kind) {
+      return kind === "image"
+        ? { human: "Real photo", ai: "AI or synthetic" }
+        : { human: "Human-written", ai: "AI-style text" };
+    }
+    function answerLabel(kind, v) { return choiceLabels(kind)[v] || v; }
+    function tierForPct(p) {
+      if (p < 50) return "foundation"; if (p < 85) return "intermediate"; return "expert";
+    }
+    function showPanel(id) {
+      document.querySelectorAll(".panel").forEach(el => {
+        const on = el.id === id; el.classList.toggle("active", on); el.hidden = !on;
+      });
+    }
+
+    function renderQuiz() {
+      const container = document.getElementById("quiz-items");
+      container.innerHTML = "";
+      items.forEach((item, i) => {
+        const labels = choiceLabels(item.kind);
+        const typeTag = item.kind === "image" ? "Image" : "Text";
+        const article = document.createElement("article");
+        article.className = "quiz-item";
+        const media = item.kind === "image"
+          ? `<div class="quiz-image-wrap"><img class="quiz-image" src="${item.imageSrc}" alt="${escapeHtml(item.imageAlt)}" width="480" height="320" loading="lazy" /></div><p class="image-prompt">Was this taken with a camera, or is it AI / synthetic?</p>`
+          : `<p class="passage">${escapeHtml(item.passage)}</p>`;
+        article.innerHTML = `
+          <p class="quiz-item-label">${typeTag} · Question ${i + 1} of ${items.length}</p>
+          ${media}
+          <div class="choice-row">
+            <label class="choice-human"><input type="radio" name="${item.id}" value="human" required />${escapeHtml(labels.human)}</label>
+            <label class="choice-ai"><input type="radio" name="${item.id}" value="ai" required />${escapeHtml(labels.ai)}</label>
+          </div>`;
+        container.appendChild(article);
+      });
+      updateProgress();
+      document.getElementById("quiz-form").querySelectorAll('input[type="radio"]')
+        .forEach(inp => inp.addEventListener("change", updateProgress));
+    }
+
+    function updateProgress() {
+      const answered = items.filter(item => document.querySelector(`input[name="${item.id}"]:checked`)).length;
+      document.getElementById("quiz-progress").textContent = `${answered} of ${items.length} answered`;
+    }
+
+    document.getElementById("quiz-form").addEventListener("submit", e => {
+      e.preventDefault();
+      let correct = 0;
+      const details = items.map(item => {
+        const sel = e.target.querySelector(`input[name="${item.id}"]:checked`);
+        const guess = sel ? sel.value : null;
+        const ok = guess === item.answer;
+        if (ok) correct++;
+        return { ...item, guess, ok };
+      });
+      const pct = Math.round((correct / items.length) * 100);
+
+      if (pct === 100) {
+        setTimeout(() => {
+          confetti({ particleCount: 180, spread: 80, origin: { y: 0.3 }, colors: ["#7c4a1e","#c8831a","#f5d08a","#5a8a3c","#fff8f0"] });
+          setTimeout(() => confetti({ particleCount: 120, spread: 100, origin: { x: 0.1, y: 0.5 } }), 300);
+          setTimeout(() => confetti({ particleCount: 120, spread: 100, origin: { x: 0.9, y: 0.5 } }), 500);
+        }, 400);
+      }
+
+      document.getElementById("score-line").textContent = `${correct} / ${items.length} correct (${pct}%)`;
+      const tierLabels = { foundation: "Growing observer", intermediate: "Solid instincts", expert: "Sharp eye — stay humble" };
+      const tier = tierForPct(pct);
+      document.getElementById("tier-label").textContent = tierLabels[tier];
+      document.getElementById("tier-blurb").textContent =
+        pct === 100 ? "Perfect score! You nailed every question." :
+        pct >= 85 ? "Great instincts — a few tricky ones got by you." :
+        pct >= 50 ? "Solid start. The modules will sharpen your eye." :
+        "This stuff is genuinely hard. The modules will help.";
+
+      // Wrong answers review
+      const card = document.getElementById("review-card");
+      const wrong = details.filter(d => !d.ok);
+      card.hidden = false;
+      document.getElementById("review-intro").textContent = wrong.length === 0
+        ? "Nothing to review — you labeled every item correctly!"
+        : "Below is each question you missed, what you picked, and why.";
+      document.getElementById("review-list").innerHTML = wrong.map(d => {
+        const idx = items.findIndex(q => q.id === d.id) + 1;
+        const typeTag = d.kind === "image" ? "Image" : "Text";
+        const thumb = d.kind === "image"
+          ? `<div class="review-thumb-wrap"><img class="review-thumb" src="${d.imageSrc}" alt="${escapeHtml(d.imageAlt)}" width="240" height="160" loading="lazy" /></div>`
+          : `<blockquote class="review-quote">${escapeHtml(d.passage)}</blockquote>`;
+        return `<article class="review-item">
+          <h4 class="review-item-title">${typeTag} · Question ${idx}</h4>
+          ${thumb}
+          <p class="review-picks"><span class="review-wrong-pick">You chose: ${escapeHtml(answerLabel(d.kind, d.guess))}</span> · <span class="review-right-pick">Correct: ${escapeHtml(answerLabel(d.kind, d.answer))}</span></p>
+          <div class="review-explain"><p>${escapeHtml(d.explanation)}</p></div>
+        </article>`;
+      }).join("");
+
+      // Reading section
+      const data = READING_BY_TIER[tier];
+      const body = document.getElementById("reading-body");
+      body.innerHTML = `<p class="track-intro"><strong>${escapeHtml(data.title)}</strong> — ${escapeHtml(data.subtitle)}</p>`;
+      data.sections.forEach(sec => {
+        const h4 = document.createElement("h4"); h4.textContent = sec.heading;
+        const wrap = document.createElement("div"); wrap.innerHTML = sec.html;
+        body.appendChild(h4); body.appendChild(wrap);
+      });
+
+      showPanel("screen-results");
+      requestAnimationFrame(() => window.scrollTo(0, 0));
+    });
+
+    document.getElementById("btn-retake").addEventListener("click", () => {
+      document.getElementById("quiz-form").reset();
+      showPanel("screen-quiz");
+      renderQuiz();
+      requestAnimationFrame(() => window.scrollTo(0, 0));
+    });
+
+    renderQuiz();
+  </script>
+</body>
+</html>

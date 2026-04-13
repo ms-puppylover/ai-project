@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Real or AI? — Learning Modules</title>
+  <link rel="preconnect" href="https://api.fontshare.com" />
+  <link href="https://api.fontshare.com/v2/css?f[]=recoleta@400,500,700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="noise" aria-hidden="true"></div>
+  <main class="shell">
+    <header class="hero">
+      <p class="eyebrow">AI Literacy · Learning Modules</p>
+      <h1>Real or <em>AI?</em></h1>
+      <p class="lede">Three skill tracks — words, images, and habits. Read each card, then prove you got it with a checkpoint quiz.</p>
+    </header>
+
+    <!-- Track picker -->
+    <section id="screen-home" class="panel active" aria-labelledby="home-heading">
+      <h2 id="home-heading" class="sr-only">Choose a track</h2>
+      <div class="level-tabs" id="track-tabs"></div>
+      <p class="home-status" id="track-status"></p>
+      <div class="home-actions">
+        <button type="button" class="btn primary" id="btn-start-track">Start Module Track 1 →</button>
+      </div>
+    </section>
+
+    <!-- Module slides -->
+    <section id="screen-modules" class="panel" hidden aria-labelledby="modules-heading">
+      <p class="module-meta" id="module-meta"></p>
+      <h2 class="module-h2" id="modules-heading">Module</h2>
+      <div class="module-body" id="module-body"></div>
+      <p class="module-slide-count" id="module-slide-count" aria-live="polite"></p>
+      <div class="module-actions">
+        <button type="button" class="btn primary" id="btn-module-next">Next</button>
+        <button type="button" class="btn ghost" id="btn-back-home">← Back to tracks</button>
+      </div>
+    </section>
+
+    <!-- Checkpoint quiz -->
+    <section id="screen-quiz" class="panel" hidden aria-labelledby="quiz-heading">
+      <div class="quiz-top">
+        <p class="quiz-context" id="quiz-context" aria-live="polite"></p>
+        <h2 id="quiz-heading" class="sr-only">Checkpoint Quiz</h2>
+        <p class="progress" id="quiz-progress" aria-live="polite"></p>
+      </div>
+      <form id="quiz-form" novalidate>
+        <div id="quiz-items"></div>
+        <div class="form-actions">
+          <button type="submit" class="btn primary">Submit answers</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- Results -->
+    <section id="screen-results" class="panel" hidden aria-labelledby="results-heading">
+      <div class="star-award" id="star-award" hidden aria-live="polite">
+        <span class="golden-star" aria-hidden="true">★</span>
+        <p class="star-award-text" id="star-award-text">Star earned!</p>
+      </div>
+      <h2 id="results-heading">Your result</h2>
+      <p class="score-display" id="score-line" aria-live="polite"></p>
+      <p class="tier-label" id="tier-label"></p>
+      <p class="tier-blurb" id="tier-blurb"></p>
+      <div class="review-card" id="review-card" hidden aria-live="polite">
+        <h3>What you missed — and why</h3>
+        <p class="review-intro" id="review-intro"></p>
+        <div id="review-list"></div>
+      </div>
+      <div class="results-actions">
+        <button type="button" class="btn primary" id="btn-results-next">Continue</button>
+        <button type="button" class="btn ghost" id="btn-results-retry" hidden>Retry quiz</button>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+  <script src="course-content.js"></script>
+  <script>
+    const TRACK_TITLES = ["Words: spot the filler", "Images: real or computer-made?", "Habits: trust but verify"];
+    let activeTrack = 1;
+    let slideIndex  = 0;
+    let activeQuizItems = [];
+    let lastPassed = false;
+    let stars = [false, false, false]; // star per track
+
+    function escapeHtml(t) {
+      const d = document.createElement("div"); d.textContent = t; return d.innerHTML;
+    }
+    function choiceLabels(kind) {
+      return kind === "image"
+        ? { human: "Real photo", ai: "AI or synthetic" }
+        : { human: "Human-written", ai: "AI-style text" };
+    }
+    function answerLabel(kind, v) { return choiceLabels(kind)[v] || v; }
+    function showPanel(id) {
+      document.querySelectorAll(".panel").forEach(el => {
+        const on = el.id === id; el.classList.toggle("active", on); el.hidden = !on;
+      });
+    }
+
+    // ── Track picker ──
+    function renderTrackPicker() {
+      const tabs = document.getElementById("track-tabs");
+      tabs.innerHTML = [1, 2, 3].map(n => {
+        const done = stars[n - 1];
+        const active = n === activeTrack;
+        return `<button class="level-tab${active ? " active" : ""}" data-track="${n}">
+          Track ${n}${done ? " ★" : ""}
+        </button>`;
+      }).join("");
+      tabs.querySelectorAll(".level-tab").forEach(btn => {
+        btn.addEventListener("click", () => {
+          activeTrack = Number(btn.dataset.track);
+          renderTrackPicker();
+          document.getElementById("btn-start-track").textContent = `Start Module Track ${activeTrack} →`;
+          document.getElementById("track-status").textContent = TRACK_TITLES[activeTrack - 1];
+        });
+      });
+      document.getElementById("track-status").textContent = TRACK_TITLES[activeTrack - 1];
+      document.getElementById("btn-start-track").textContent = `Start Module Track ${activeTrack} →`;
+    }
+
+    document.getElementById("btn-start-track").addEventListener("click", () => openTrack(activeTrack));
+    document.getElementById("btn-back-home").addEventListener("click", () => {
+      showPanel("screen-home");
+      renderTrackPicker();
+      requestAnimationFrame(() => window.scrollTo(0, 0));
+    });
+
+    // ── Module slides ──
+    function openTrack(track) {
+      activeTrack = track;
+      slideIndex  = 0;
+      renderSlide();
+      showPanel("screen-modules");
+      requestAnimationFrame(() => window.scrollTo(0, 0));
+    }
+
+    function renderSlide() {
+      const slides = (MODULES_BY_LEVEL.beginner || [])[activeTrack - 1] || [];
+      const slide  = slides[slideIndex];
+      if (!slide) return;
+      document.getElementById("module-meta").textContent =
+        `Beginner · Track ${activeTrack} of 3 · Card ${slideIndex + 1} of ${slides.length}`;
+      document.getElementById("modules-heading").textContent = slide.title;
+      document.getElementById("module-body").innerHTML = slide.html;
+      document.getElementById("module-slide-count").textContent = `Page ${slideIndex + 1} of ${slides.length}`;
+      document.getElementById("btn-module-next").textContent =
+        slideIndex >= slides.length - 1 ? "Take checkpoint quiz" : "Next";
+    }
+
+    document.getElementById("btn-module-next").addEventListener("click", () => {
+      const slides = (MODULES_BY_LEVEL.beginner || [])[activeTrack - 1] || [];
+      if (slideIndex < slides.length - 1) {
+        slideIndex++;
+        renderSlide();
+        requestAnimationFrame(() => window.scrollTo(0, 0));
+        return;
+      }
+      startCheckpoint();
+    });
+
+    // ── Checkpoint quiz ──
+    function startCheckpoint() {
+      activeQuizItems = CHECKPOINT_QUIZZES.beginner[activeTrack - 1] || [];
+      const need = starThresholdForQuiz(activeQuizItems);
+      document.getElementById("quiz-context").textContent =
+        `Track ${activeTrack} checkpoint · ${TRACK_TITLES[activeTrack - 1]} · need ${need} / ${activeQuizItems.length} for a ★`;
+      renderQuiz();
+      showPanel("screen-quiz");
+      requestAnimationFrame(() => window.scrollTo(0, 0));
+    }
+
+    function renderQuiz() {
+      const container = document.getElementById("quiz-items");
+      container.innerHTML = "";
+      activeQuizItems.forEach((item, i) => {
+        const labels = choiceLabels(item.kind);
+        const article = document.createElement("article");
+        article.className = "quiz-item";
+        const media = item.kind === "image"
+          ? `<div class="quiz-image-wrap"><img class="quiz-image" src="${item.imageSrc}" alt="${escapeHtml(item.imageAlt)}" width="480" height="320" loading="lazy" /></div><p class="image-prompt">Was this taken with a camera, or is it AI / synthetic?</p>`
+          : `<p class="passage">${escapeHtml(item.passage)}</p>`;
+        article.innerHTML = `
+          <p class="quiz-item-label">${item.kind === "image" ? "Image" : "Text"} · Question ${i + 1} of ${activeQuizItems.length}</p>
+          ${media}
+          <div class="choice-row">
+            <label class="choice-human"><input type="radio" name="${item.id}" value="human" required />${escapeHtml(labels.human)}</label>
+            <label class="choice-ai"><input type="radio" name="${item.id}" value="ai" required />${escapeHtml(labels.ai)}</label>
+          </div>`;
+        container.appendChild(article);
+      });
+      updateProgress();
+      document.getElementById("quiz-form").querySelectorAll('input[type="radio"]')
+        .forEach(inp => inp.addEventListener("change", updateProgress));
+    }
+
+    function updateProgress() {
+      const answered = activeQuizItems.filter(item =>
+        document.querySelector(`input[name="${item.id}"]:checked`)).length;
+      document.getElementById("quiz-progress").textContent = `${answered} of ${activeQuizItems.length} answered`;
+    }
+
+    document.getElementById("quiz-form").addEventListener("submit", e => {
+      e.preventDefault();
+      let correct = 0;
+      const details = activeQuizItems.map(item => {
+        const sel = e.target.querySelector(`input[name="${item.id}"]:checked`);
+        const guess = sel ? sel.value : null;
+        const ok = guess === item.answer;
+        if (ok) correct++;
+        return { ...item, guess, ok };
+      });
+      const pct  = Math.round((correct / activeQuizItems.length) * 100);
+      const need = starThresholdForQuiz(activeQuizItems);
+      lastPassed = correct >= need;
+
+      if (lastPassed) stars[activeTrack - 1] = true;
+
+      if (pct === 100) {
+        setTimeout(() => {
+          confetti({ particleCount: 180, spread: 80, origin: { y: 0.3 }, colors: ["#7c4a1e","#c8831a","#f5d08a","#5a8a3c","#fff8f0"] });
+          setTimeout(() => confetti({ particleCount: 120, spread: 100, origin: { x: 0.1, y: 0.5 } }), 300);
+          setTimeout(() => confetti({ particleCount: 120, spread: 100, origin: { x: 0.9, y: 0.5 } }), 500);
+        }, 400);
+      }
+
+      // Star award
+      const starAward = document.getElementById("star-award");
+      starAward.hidden = !lastPassed;
+      if (lastPassed) document.getElementById("star-award-text").textContent = `★ Star earned for Track ${activeTrack}!`;
+
+      document.getElementById("score-line").textContent = `${correct} / ${activeQuizItems.length} correct (${pct}%)`;
+      const tierLabels = { foundation: "Growing observer", intermediate: "Solid instincts", expert: "Sharp eye — stay humble" };
+      const tier = pct < 50 ? "foundation" : pct < 85 ? "intermediate" : "expert";
+      document.getElementById("tier-label").textContent = tierLabels[tier];
+      document.getElementById("tier-blurb").textContent = lastPassed
+        ? `Checkpoint passed! (${need}+ / ${activeQuizItems.length} required.)`
+        : `Need ${need}+ correct for a star. Revisit the module, then retry.`;
+
+      // Wrong review
+      const wrong = details.filter(d => !d.ok);
+      const card  = document.getElementById("review-card");
+      card.hidden = false;
+      document.getElementById("review-intro").textContent = wrong.length === 0
+        ? "Nothing to review — you labeled every item correctly!"
+        : "Below is each question you missed, what you picked, and why.";
+      document.getElementById("review-list").innerHTML = wrong.map(d => {
+        const idx = activeQuizItems.findIndex(q => q.id === d.id) + 1;
+        const thumb = d.kind === "image"
+          ? `<div class="review-thumb-wrap"><img class="review-thumb" src="${d.imageSrc}" alt="${escapeHtml(d.imageAlt)}" width="240" height="160" loading="lazy" /></div>`
+          : `<blockquote class="review-quote">${escapeHtml(d.passage)}</blockquote>`;
+        return `<article class="review-item">
+          <h4 class="review-item-title">${d.kind === "image" ? "Image" : "Text"} · Question ${idx}</h4>
+          ${thumb}
+          <p class="review-picks"><span class="review-wrong-pick">You chose: ${escapeHtml(answerLabel(d.kind, d.guess))}</span> · <span class="review-right-pick">Correct: ${escapeHtml(answerLabel(d.kind, d.answer))}</span></p>
+          <div class="review-explain"><p>${escapeHtml(d.explanation)}</p></div>
+        </article>`;
+      }).join("");
+
+      // Next button
+      const nextBtn  = document.getElementById("btn-results-next");
+      const retryBtn = document.getElementById("btn-results-retry");
+      if (lastPassed && activeTrack < 3) {
+        nextBtn.textContent = `Continue to Track ${activeTrack + 1} →`;
+      } else if (lastPassed && activeTrack === 3) {
+        nextBtn.textContent = "All done! Back to tracks";
+      } else {
+        nextBtn.textContent = "Review module again";
+        retryBtn.hidden = false;
+      }
+
+      showPanel("screen-results");
+      requestAnimationFrame(() => window.scrollTo(0, 0));
+    });
+
+    document.getElementById("btn-results-next").addEventListener("click", () => {
+      document.getElementById("review-card").hidden = true;
+      document.getElementById("star-award").hidden  = true;
+      document.getElementById("btn-results-retry").hidden = true;
+      if (lastPassed && activeTrack < 3) {
+        openTrack(activeTrack + 1);
+      } else {
+        showPanel("screen-home");
+        renderTrackPicker();
+      }
+      requestAnimationFrame(() => window.scrollTo(0, 0));
+    });
+
+    document.getElementById("btn-results-retry").addEventListener("click", () => {
+      document.getElementById("review-card").hidden = true;
+      document.getElementById("star-award").hidden  = true;
+      document.getElementById("btn-results-retry").hidden = true;
+      document.getElementById("quiz-form").reset();
+      startCheckpoint();
+    });
+
+    renderTrackPicker();
+  </script>
+</body>
+</html>
